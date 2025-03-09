@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <!-- Título que aparece na aba do navegador -->
+  <title>Checklist dos Pisos</title>
+
+  <!-- Favicon (ícone da aba do navegador) -->
+  <!-- Ajuste o caminho do arquivo de ícone conforme necessário -->
+  <link rel="icon" href="assets/images/floor_icon.png" type="image/png">
+
+  <!-- Bootstrap CSS via CDN -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!-- Fonte personalizada -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  <!-- CSS personalizado -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Container de Login -->
+  <div id="loginContainer" class="container mt-4 p-4 shadow-lg rounded bg-light tech-container">
+    <h2 class="mb-4 text-center text-light-tech">Acesse seu Checklist</h2>
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="username" class="text-light-tech">Usuário</label>
+        <input type="text" class="form-control" id="username" placeholder="Digite seu usuário" required>
+      </div>
+      <div class="form-group">
+        <label for="password" class="text-light-tech">Senha</label>
+        <input type="password" class="form-control" id="password" placeholder="Digite sua senha" required>
+      </div>
+      <button type="submit" class="btn btn-tech btn-block">Entrar / Registrar</button>
+    </form>
+  </div>
+
+  <!-- Container do Checklist (inicialmente oculto) -->
+  <div id="checklistContainer" class="container mt-4 p-4 shadow-lg rounded bg-light tech-container" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <!-- Título centralizado dentro do container -->
+      <h2 class="text-light-tech text-center m-0" style="width: 100%;">Checklist dos Pisos</h2>
+      <!-- Botão de sair (logout) -->
+      <button id="logoutBtn" class="btn btn-danger btn-sm" style="position: absolute; right: 30px;">Sair</button>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-bordered table-dark" id="checklistTable">
+        <thead class="thead-tech">
+          <tr>
+            <th>Data</th>
+            <th>Piso</th>
+            <th>Posição</th>
+            <th>Observação</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Linhas adicionadas dinamicamente pelo script.js -->
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="text-center mt-3">
+      <button id="addRow" class="btn btn-tech mr-2">Adicionar Linha</button>
+      <button id="exportExcel" class="btn btn-success-tech">Exportar para Excel</button>
+    </div>
+  </div>
+  
+  <!-- Ícone de salvamento no canto superior direito -->
+  <div id="saveStatus">
+    <div class="spinner-border spinner-border-sm text-neon" role="status">
+      <span class="sr-only">Salvando...</span>
+    </div>
+    <span class="ml-2">Salvo!</span>
+  </div>
+
+  <!-- jQuery e Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <!-- SheetJS para exportação -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- Script personalizado -->
+  <script src="js/script.js"></script>
+</body>
+</html>

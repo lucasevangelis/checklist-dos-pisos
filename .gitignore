@@ -1,0 +1,2 @@
+# Ignorar o arquivo .env para proteger senhas e chaves de API
+.env

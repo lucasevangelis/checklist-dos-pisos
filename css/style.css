@@ -1,0 +1,94 @@
+/* ===== FONTE E BACKGROUND GERAL ===== */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
+    min-height: 100vh;
+  }
+  
+  /* ===== CONTAINER PRINCIPAL ===== */
+  .tech-container {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+  }
+  
+  /* ===== TÍTULO ===== */
+  .text-light-tech {
+    color: #48CAE4;
+    text-shadow: 0 0 5px rgba(72, 202, 228, 0.5);
+    margin-top: 0;
+  }
+  
+  /* ===== BOTÕES ===== */
+  .btn-tech {
+    background-color: #00FFCB;
+    color: #000;
+    border-radius: 25px;
+    padding: 10px 20px;
+    border: none;
+    transition: 0.3s;
+  }
+  .btn-tech:hover {
+    background-color: #00bfa6;
+  }
+  
+  .btn-success-tech {
+    background-color: #28a745;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 20px;
+    color: #fff;
+    transition: 0.3s;
+  }
+  .btn-success-tech:hover {
+    background-color: #218838;
+  }
+  
+  /* ===== TABELA ===== */
+  .table-dark {
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    color: #fff !important;
+    border-color: #444 !important;
+  }
+  .thead-tech th {
+    background-color: #2c5364;
+    color: #fff;
+    text-align: center;
+    vertical-align: middle;
+  }
+  
+  /* ===== ÍCONE DE SALVAMENTO NO CANTO SUPERIOR DIREITO ===== */
+  #saveStatus {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    align-items: center;
+    background-color: #2c5364;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 9999;
+  }
+  #saveStatus.show {
+    opacity: 1;
+  }
+  .text-neon {
+    color: #00FFCB !important;
+  }
+  
+  /* ===== RESPONSIVIDADE ===== */
+  @media (max-width: 576px) {
+    .btn-tech,
+    .btn-success-tech {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  }
+  
