@@ -4,11 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
-  <!-- Título que aparece na aba do navegador -->
+  <!-- Título e ícone -->
   <title>Checklist dos Pisos</title>
-
-  <!-- Favicon (ícone da aba do navegador) -->
-  <!-- Ajuste o caminho do arquivo de ícone conforme necessário -->
   <link rel="icon" href="assets/images/floor_icon.png" type="image/png">
 
   <!-- Bootstrap CSS via CDN -->
@@ -20,7 +17,7 @@
 </head>
 <body>
   <!-- Container de Login -->
-  <div id="loginContainer" class="container mt-4 p-4 shadow-lg rounded bg-light tech-container">
+  <div id="loginContainer" class="container-fluid mt-4 p-4 shadow-lg rounded bg-light tech-container">
     <h2 class="mb-4 text-center text-light-tech">Acesse seu Checklist</h2>
     <form id="loginForm">
       <div class="form-group">
@@ -36,16 +33,19 @@
   </div>
 
   <!-- Container do Checklist (inicialmente oculto) -->
-  <div id="checklistContainer" class="container mt-4 p-4 shadow-lg rounded bg-light tech-container" style="display: none;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <!-- Título centralizado dentro do container -->
+  <div id="checklistContainer" class="container-fluid mt-4 p-4 shadow-lg rounded bg-light tech-container" style="display: none;">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+      <!-- Título centralizado -->
       <h2 class="text-light-tech text-center m-0" style="width: 100%;">Checklist dos Pisos</h2>
       <!-- Botão de sair (logout) -->
-      <button id="logoutBtn" class="btn btn-danger btn-sm" style="position: absolute; right: 30px;">Sair</button>
+      <button id="logoutBtn" class="btn btn-danger btn-sm mt-2" style="position: absolute; right: 30px;">
+        Sair
+      </button>
     </div>
     
+    <!-- Tabela responsiva e mais compacta -->
     <div class="table-responsive">
-      <table class="table table-bordered table-dark" id="checklistTable">
+      <table class="table table-bordered table-dark table-sm" id="checklistTable">
         <thead class="thead-tech">
           <tr>
             <th>Data</th>
