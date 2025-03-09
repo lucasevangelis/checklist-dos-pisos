@@ -60,6 +60,21 @@ body {
     vertical-align: middle;
   }
   
+  /* ============== CORREÇÃO ROBUSTA PARA A COLUNA PISO ============== */
+  /* Define uma largura mínima para a segunda coluna (Piso) */
+  .table-dark th:nth-child(2),
+  .table-dark td:nth-child(2) {
+    min-width: 90px; /* Ajuste conforme necessário */
+  }
+  
+  /* Ajusta o <select> para ter cor de fundo e texto visíveis */
+  select.form-control.piso-select {
+    background-color: #444;
+    color: #fff;
+    width: 100%;
+    min-width: 80px;
+  }
+  
   /* ===== ÍCONE DE SALVAMENTO NO CANTO SUPERIOR DIREITO ===== */
   #saveStatus {
     position: fixed;
