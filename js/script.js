@@ -1,3 +1,6 @@
+// Array local para armazenar os itens do checklist
+let checklistArray = [];
+
 // Função para gerar hash SHA‑256 de uma senha
 async function hashPassword(password) {
   const encoder = new TextEncoder();
@@ -8,19 +11,15 @@ async function hashPassword(password) {
   return hashHex;
 }
 
-// Função para inicializar usuários padrão usando variáveis de ambiente (se suportadas) ou valores de fallback
+// Inicializa usuários padrão
 async function initializeDefaultUsers() {
   let users = localStorage.getItem("users");
   if (!users) {
     const defaultUsers = {
-      [typeof process !== "undefined" && process.env && process.env.DEFAULT_USER1 ? process.env.DEFAULT_USER1 : "user1"]: 
-        typeof process !== "undefined" && process.env && process.env.DEFAULT_PASS1 ? process.env.DEFAULT_PASS1 : "CLK*834",
-      [typeof process !== "undefined" && process.env && process.env.DEFAULT_USER2 ? process.env.DEFAULT_USER2 : "user2"]: 
-        typeof process !== "undefined" && process.env && process.env.DEFAULT_PASS2 ? process.env.DEFAULT_PASS2 : "571+CLK",
-      [typeof process !== "undefined" && process.env && process.env.DEFAULT_USER3 ? process.env.DEFAULT_USER3 : "user3"]: 
-        typeof process !== "undefined" && process.env && process.env.DEFAULT_PASS3 ? process.env.DEFAULT_PASS3 : "KLC%385",
-      [typeof process !== "undefined" && process.env && process.env.DEFAULT_USER4 ? process.env.DEFAULT_USER4 : "user4"]: 
-        typeof process !== "undefined" && process.env && process.env.DEFAULT_PASS4 ? process.env.DEFAULT_PASS4 : "INY!684"
+      "user1": "CLK*834",
+      "user2": "571+CLK",
+      "user3": "KLC%385",
+      "user4": "INY!684"
     };
     let hashedUsers = {};
     for (const user in defaultUsers) {
@@ -33,241 +32,187 @@ async function initializeDefaultUsers() {
 // Variável global para o usuário logado
 let loggedUser = null;
 
-// Exibe o ícone de salvamento de forma sutil
-function showSaveStatus() {
-  const statusElem = document.getElementById("saveStatus");
-  statusElem.classList.add("show");
-  setTimeout(() => {
-    statusElem.classList.remove("show");
-  }, 1500);
+// Exibe um toast (Bootstrap)
+function showToast(message) {
+  const toastElem = document.getElementById("toastMsg");
+  toastElem.querySelector(".toast-body").textContent = message;
+  $(toastElem).toast('show');
 }
 
-// Salva os dados da tabela no localStorage para o usuário logado
-function saveTableData() {
-  if (!loggedUser) return;
-  const table = document.getElementById("checklistTable");
-  const data = [];
-  table.querySelectorAll("tbody tr").forEach(tr => {
-    const row = [];
-    tr.querySelectorAll("td").forEach((td, index) => {
-      if (index === 4) return; // Ignorar coluna de ação
-      const element = td.querySelector("input") || td.querySelector("select");
-      row.push(element ? element.value : td.textContent.trim());
-    });
-    data.push(row);
-  });
-  localStorage.setItem("checklistData_" + loggedUser, JSON.stringify(data));
-  showSaveStatus();
-}
-
-// Carrega os dados do localStorage para o usuário logado e preenche a tabela
-function loadTableData() {
-  if (!loggedUser) return;
-  const data = localStorage.getItem("checklistData_" + loggedUser);
-  if (data) {
-    const rows = JSON.parse(data);
-    const tbody = document.querySelector("#checklistTable tbody");
-    tbody.innerHTML = "";
-    rows.forEach(rowData => {
-      addRow(rowData);
-    });
+// Remove splash screen
+function removeSplash() {
+  const splash = document.getElementById("splash");
+  if (splash) {
+    splash.style.opacity = '0';
+    splash.style.pointerEvents = 'none';
+    setTimeout(() => {
+      splash.remove();
+    }, 1000);
   }
 }
 
-// Capitaliza a primeira letra de uma string
-function capitalizeFirstLetter(text) {
-  if (!text) return "";
-  return text.charAt(0).toUpperCase() + text.slice(1);
-}
-
-// Adiciona uma nova linha na tabela
-// Opcional: rowData = [data, piso, posição, observação]
-function addRow(rowData) {
-  const tbody = document.querySelector("#checklistTable tbody");
-  const tr = document.createElement("tr");
-  
-  // Função auxiliar para adicionar o evento "change" e salvar os dados
-  function attachChangeListener(element) {
-    element.addEventListener("change", saveTableData);
-  }
-  
-  // Coluna "Data"
-  let td = document.createElement("td");
-  let inputData = document.createElement("input");
-  inputData.type = "date";
-  inputData.className = "form-control";
-  if (rowData && rowData[0]) {
-    inputData.value = rowData[0];
-  }
-  attachChangeListener(inputData);
-  td.appendChild(inputData);
-  tr.appendChild(td);
-  
-  // Coluna "Piso" com <select>
-  td = document.createElement("td");
-  let selectPiso = document.createElement("select");
-  selectPiso.className = "form-control";
-  const pisos = ["2", "3", "4", "5", "6"];
-  pisos.forEach(function(piso) {
-    let option = document.createElement("option");
-    option.value = piso;
-    option.textContent = piso;
-    selectPiso.appendChild(option);
-  });
-  if (rowData && rowData[1]) {
-    selectPiso.value = rowData[1];
-  }
-  attachChangeListener(selectPiso);
-  td.appendChild(selectPiso);
-  tr.appendChild(td);
-  
-  // Coluna "Posição" (aceita somente números)
-  td = document.createElement("td");
-  let inputPosicao = document.createElement("input");
-  inputPosicao.type = "text";
-  inputPosicao.placeholder = "Posição";
-  inputPosicao.className = "form-control";
-  if (rowData && rowData[2]) {
-    inputPosicao.value = rowData[2];
-  }
-  inputPosicao.addEventListener("blur", function() {
-    // Remove caracteres que não sejam dígitos
-    let filtered = this.value.replace(/\D/g, '');
-    if (this.value !== filtered) {
-      alert("Apenas números são permitidos na coluna 'Posição'. O valor foi corrigido.");
-      this.value = filtered;
-    }
-    saveTableData();
-  });
-  attachChangeListener(inputPosicao);
-  td.appendChild(inputPosicao);
-  tr.appendChild(td);
-  
-  // Coluna "Observação" com autocorreção da primeira letra
-  td = document.createElement("td");
-  let inputObs = document.createElement("input");
-  inputObs.type = "text";
-  inputObs.placeholder = "Observação";
-  inputObs.className = "form-control";
-  if (rowData && rowData[3]) {
-    inputObs.value = rowData[3];
-  }
-  inputObs.addEventListener("blur", function() {
-    this.value = capitalizeFirstLetter(this.value);
-    saveTableData();
-  });
-  attachChangeListener(inputObs);
-  td.appendChild(inputObs);
-  tr.appendChild(td);
-  
-  // Coluna "Ação" para remover a linha
-  td = document.createElement("td");
-  let btnRemove = document.createElement("button");
-  btnRemove.textContent = "Remover";
-  btnRemove.className = "btn btn-danger btn-sm";
-  btnRemove.addEventListener("click", () => {
-    tbody.removeChild(tr);
-    saveTableData();
-  });
-  td.appendChild(btnRemove);
-  tr.appendChild(td);
-  
-  tbody.appendChild(tr);
-  saveTableData();
-}
-
-// Exporta a tabela para Excel usando SheetJS
-function exportTableToExcel() {
-  const table = document.getElementById("checklistTable");
-  const data = [];
-  const headers = [];
-  table.querySelectorAll("thead th").forEach(th => {
-    if(th.textContent.trim() !== "Ação"){
-      headers.push(th.textContent.trim());
-    }
-  });
-  data.push(headers);
-  
-  table.querySelectorAll("tbody tr").forEach(tr => {
-    const row = [];
-    tr.querySelectorAll("td").forEach((td, index) => {
-      if(index === 4) return;
-      const element = td.querySelector("input") || td.querySelector("select");
-      row.push(element ? element.value : td.textContent.trim());
-    });
-    data.push(row);
-  });
-  
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Checklist");
-  XLSX.writeFile(wb, "checklist.xlsx");
-}
-
-// Função para tratar o login/registro do usuário
+// Login/Registro
 async function handleLogin(e) {
   e.preventDefault();
   const userInput = document.getElementById("username").value.trim();
   const passInput = document.getElementById("password").value;
-  
   if (!userInput || !passInput) {
-    alert("Por favor, preencha usuário e senha.");
+    showToast("Preencha usuário e senha.");
     return;
   }
-  
   let users = localStorage.getItem("users");
   users = users ? JSON.parse(users) : {};
-  
   const hashedInput = await hashPassword(passInput);
-  
   if (!users[userInput]) {
     if (confirm("Usuário não encontrado. Deseja registrá-lo?")) {
       users[userInput] = hashedInput;
       localStorage.setItem("users", JSON.stringify(users));
-      alert("Usuário registrado com sucesso!");
+      showToast("Usuário registrado com sucesso!");
     } else {
       return;
     }
   } else {
     if (users[userInput] !== hashedInput) {
-      alert("Senha incorreta. Tente novamente.");
+      showToast("Senha incorreta. Tente novamente.");
       return;
     }
   }
-  
   loggedUser = userInput;
   sessionStorage.setItem("loggedUser", loggedUser);
-  document.getElementById("loginContainer").style.display = "none";
-  document.getElementById("checklistContainer").style.display = "block";
-  loadTableData();
 
-  // Registra os event listeners para os botões que agora fazem parte da tela do checklist
-  document.getElementById("addRow").addEventListener("click", () => addRow());
-  document.getElementById("exportExcel").addEventListener("click", exportTableToExcel);
+  // Oculta o login e mostra o wizard
+  document.getElementById("loginContainer").style.display = "none";
+  document.getElementById("wizardContainer").style.display = "block";
 }
 
-// Trata o logout
+// Logout
 function handleLogout() {
   sessionStorage.removeItem("loggedUser");
   loggedUser = null;
   location.reload();
 }
 
-// Eventos de login e logout
-document.getElementById("loginForm").addEventListener("submit", handleLogin);
-document.getElementById("logoutBtn").addEventListener("click", handleLogout);
+// Wizard: passos
+let currentStep = 1;
+function showStep(step) {
+  const steps = document.querySelectorAll(".wizard-step");
+  steps.forEach((el) => (el.style.display = "none"));
+  document.getElementById(`step${step}`).style.display = "block";
+  currentStep = step;
+}
 
-// Ao carregar a página, inicializa os usuários padrão e, se houver um usuário logado, carrega o checklist
+// Validações básicas
+function nextStep1() {
+  const wizDate = document.getElementById("wizDate");
+  if (!wizDate.value) {
+    showToast("Selecione a data.");
+    return;
+  }
+  showStep(2);
+}
+function nextStep2() {
+  showStep(3);
+}
+function nextStep3() {
+  // Auto-corrige "Posição" para só números
+  const wizPosicao = document.getElementById("wizPosicao");
+  wizPosicao.value = wizPosicao.value.replace(/\D/g, '');
+  showStep(4);
+}
+
+// Adiciona a entrada ao array local
+function addEntry() {
+  const wizDate = document.getElementById("wizDate").value;
+  const wizPiso = document.getElementById("wizPiso").value;
+  let wizPosicao = document.getElementById("wizPosicao").value;
+  let wizObs = document.getElementById("wizObs").value.trim();
+
+  // Auto-corrige Observação (primeira letra maiúscula)
+  if (wizObs) {
+    wizObs = wizObs.charAt(0).toUpperCase() + wizObs.slice(1);
+  }
+
+  // Armazena no array local
+  checklistArray.push([wizDate, wizPiso, wizPosicao, wizObs]);
+  
+  // Limpa e volta ao passo 1
+  document.getElementById("wizDate").value = "";
+  document.getElementById("wizPiso").value = "2";
+  document.getElementById("wizPosicao").value = "";
+  document.getElementById("wizObs").value = "";
+  showStep(1);
+  showToast("Entrada adicionada com sucesso!");
+}
+
+// Gera o Excel
+function generateExcel() {
+  if (checklistArray.length === 0) {
+    showToast("Nenhuma entrada no checklist!");
+    return;
+  }
+  const data = [];
+  const headers = ["Data", "Piso", "Posição", "Observação"];
+  data.push(headers);
+  checklistArray.forEach(item => data.push(item));
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Checklist");
+  XLSX.writeFile(wb, "checklist.xlsx");
+}
+
+// Ao carregar a página
 window.addEventListener("load", async function() {
   await initializeDefaultUsers();
+  
+  // Remove splash após 2s
+  setTimeout(() => {
+    removeSplash();
+    const user = sessionStorage.getItem("loggedUser");
+    if (!user) {
+      document.getElementById("loginContainer").style.display = "block";
+    } else {
+      loggedUser = user;
+      document.getElementById("wizardContainer").style.display = "block";
+    }
+  }, 2000);
+
   const user = sessionStorage.getItem("loggedUser");
   if (user) {
     loggedUser = user;
     document.getElementById("loginContainer").style.display = "none";
-    document.getElementById("checklistContainer").style.display = "block";
-    loadTableData();
-    // Registra os event listeners para os botões do checklist
-    document.getElementById("addRow").addEventListener("click", () => addRow());
-    document.getElementById("exportExcel").addEventListener("click", exportTableToExcel);
+    document.getElementById("wizardContainer").style.display = "block";
   }
+
+  // Wizard: Botões de navegação
+  document.getElementById("nextStep1").addEventListener("click", nextStep1);
+  document.getElementById("nextStep2").addEventListener("click", nextStep2);
+  document.getElementById("nextStep3").addEventListener("click", nextStep3);
+
+  document.getElementById("backStep2").addEventListener("click", () => showStep(1));
+  document.getElementById("backStep3").addEventListener("click", () => showStep(2));
+  document.getElementById("backStep4").addEventListener("click", () => showStep(3));
+
+  // Botão "Adicionar ao Checklist"
+  document.getElementById("addEntryBtn").addEventListener("click", addEntry);
+  // Botão "Gerar Excel"
+  document.getElementById("generateExcel").addEventListener("click", generateExcel);
+
+  // Login e logout
+  document.getElementById("loginForm").addEventListener("submit", handleLogin);
+  document.getElementById("logoutBtn").addEventListener("click", handleLogout);
+
+
+  function nextStep3() {
+    const wizPosicao = document.getElementById("wizPosicao");
+    // Verifica se o valor contém somente dígitos (um ou mais)
+    if (!/^\d+$/.test(wizPosicao.value)) {
+      alert("Apenas números são permitidos na coluna Posição. Por favor, corrija o valor.");
+      return; // Impede de avançar
+    }
+    showStep(4);
+  }
+  
+
+  // Exibe passo 1 inicialmente
+  showStep(1);
 });

@@ -2,130 +2,153 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Para comportamento como aplicativo no mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   
   <title>Checklist dos Pisos</title>
+  <!-- Favicon (opcional) -->
   <link rel="icon" href="assets/images/floor_icon.png" type="image/png" />
 
-  <!-- Bootstrap CSS via CDN -->
-  <link
-    rel="stylesheet"
-    href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-  />
-  <!-- Fonte personalizada -->
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap"
-    rel="stylesheet"
-  />
+  <!-- Bootstrap CSS via CDN (v4.5.2) -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+  <!-- Font Awesome para ícones (opcional) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
   <!-- CSS personalizado -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+  <!-- Toast de feedback -->
+  <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050;">
+    <div id="toastMsg" class="toast" data-delay="1500">
+      <div class="toast-body bg-info text-white">
+        Salvo!
+      </div>
+    </div>
+  </div>
+
+  <!-- Splash Screen (exibe um logo em CSS no centro e depois remove) -->
+  <div id="splash" class="d-flex justify-content-center align-items-center">
+    <!-- Logo em CSS avançado (pisos 3D + check) -->
+    <div class="floor-advanced-logo">
+      <div class="floor-stack">
+        <div class="layer layer1"></div>
+        <div class="layer layer2"></div>
+        <div class="layer layer3"></div>
+      </div>
+      <div class="check-bubble">
+        <div class="bubble">
+          <div class="check-stem"></div>
+          <div class="check-kick"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Container de Login -->
-  <div
-    id="loginContainer"
-    class="container-fluid mt-4 p-4 shadow-lg rounded bg-light tech-container"
-  >
-    <h2 class="mb-4 text-center text-light-tech">Acesse seu Checklist</h2>
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="username" class="text-light-tech">Usuário</label>
-        <input
-          type="text"
-          class="form-control"
-          id="username"
-          placeholder="Digite seu usuário"
-          required
-        />
+  <div id="loginContainer" class="container-fluid mt-4 px-2 app-container" style="display: none;">
+    <div class="card shadow-lg rounded tech-container mx-auto">
+      <div class="card-body">
+        <h2 class="card-title text-center text-light-tech mb-4">
+          <i class="fas fa-sign-in-alt"></i> Acesse seu Checklist
+        </h2>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="username" class="text-light-tech">Usuário</label>
+            <input type="text" class="form-control" id="username" placeholder="Digite seu usuário" required />
+          </div>
+          <div class="form-group">
+            <label for="password" class="text-light-tech">Senha</label>
+            <input type="password" class="form-control" id="password" placeholder="Digite sua senha" required />
+          </div>
+          <button type="submit" class="btn btn-tech btn-block">
+            <i class="fas fa-user-check"></i> Entrar / Registrar
+          </button>
+        </form>
       </div>
-      <div class="form-group">
-        <label for="password" class="text-light-tech">Senha</label>
-        <input
-          type="password"
-          class="form-control"
-          id="password"
-          placeholder="Digite sua senha"
-          required
-        />
-      </div>
-      <button type="submit" class="btn btn-tech btn-block">
-        Entrar / Registrar
-      </button>
-    </form>
-  </div>
-
-  <!-- Container do Checklist (inicialmente oculto) -->
-  <div
-    id="checklistContainer"
-    class="container-fluid mt-4 p-4 shadow-lg rounded bg-light tech-container"
-    style="display: none;"
-  >
-    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-      <!-- Título centralizado -->
-      <h2
-        class="text-light-tech text-center m-0"
-        style="width: 100%;"
-      >
-        Checklist dos Pisos
-      </h2>
-      <!-- Botão de sair (logout) -->
-      <button
-        id="logoutBtn"
-        class="btn btn-danger btn-sm mt-2"
-        style="position: absolute; right: 30px;"
-      >
-        Sair
-      </button>
-    </div>
-
-    <!-- Tabela responsiva e compacta -->
-    <div class="table-responsive">
-      <table
-        class="table table-bordered table-dark table-sm"
-        id="checklistTable"
-      >
-        <thead class="thead-tech">
-          <tr>
-            <th>Data</th>
-            <th>Piso</th>
-            <th>Posição</th>
-            <th>Observação</th>
-            <th>Ação</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Linhas adicionadas dinamicamente -->
-        </tbody>
-      </table>
-    </div>
-
-    <div class="text-center mt-3">
-      <button id="addRow" class="btn btn-tech mr-2">Adicionar Linha</button>
-      <button id="exportExcel" class="btn btn-success-tech">
-        Exportar para Excel
-      </button>
     </div>
   </div>
 
-  <!-- Ícone de salvamento no canto superior direito -->
-  <div id="saveStatus">
-    <div class="spinner-border spinner-border-sm text-neon" role="status">
-      <span class="sr-only">Salvando...</span>
+  <!-- Container do "Wizard" (passos) -->
+  <div id="wizardContainer" class="container-fluid mt-4 px-2 app-container" style="display: none;">
+    <div class="card shadow-lg rounded tech-container mx-auto">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+          <h2 class="text-light-tech text-center w-100 mb-0">
+            <i class="fas fa-list-ul"></i> Adicionar ao Checklist
+          </h2>
+          <button id="logoutBtn" class="btn btn-danger btn-sm mt-2">
+            <i class="fas fa-sign-out-alt"></i> Sair
+          </button>
+        </div>
+
+        <!-- "Passos" do formulário (wizard) -->
+        <form id="wizardForm">
+          <!-- Passo 1: Data -->
+          <div class="wizard-step" id="step1">
+            <label for="wizDate" class="text-light-tech">Data</label>
+            <input type="date" class="form-control mb-3" id="wizDate" required />
+            <button type="button" class="btn btn-tech float-right" id="nextStep1">
+              Próximo <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          <!-- Passo 2: Piso -->
+          <div class="wizard-step" id="step2" style="display: none;">
+            <label for="wizPiso" class="text-light-tech">Piso</label>
+            <select class="form-control mb-3" id="wizPiso">
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+            <button type="button" class="btn btn-secondary" id="backStep2">
+              <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+            <button type="button" class="btn btn-tech float-right" id="nextStep2">
+              Próximo <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          <!-- Passo 3: Posição -->
+          <div class="wizard-step" id="step3" style="display: none;">
+            <label for="wizPosicao" class="text-light-tech">Posição (somente números)</label>
+            <input type="number" class="form-control mb-3" id="wizPosicao" placeholder="Ex: 101" />
+            <button type="button" class="btn btn-secondary" id="backStep3">
+              <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+            <button type="button" class="btn btn-tech float-right" id="nextStep3">
+              Próximo <i class="fas fa-arrow-right"></i>
+            </button>
+          </div>
+          <!-- Passo 4: Observação -->
+          <div class="wizard-step" id="step4" style="display: none;">
+            <label for="wizObs" class="text-light-tech">Observação</label>
+            <input type="text" class="form-control mb-3" id="wizObs" placeholder="Observação" />
+            <button type="button" class="btn btn-secondary" id="backStep4">
+              <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+            <button type="button" class="btn btn-success-tech float-right" id="addEntryBtn">
+              <i class="fas fa-check"></i> Adicionar ao Checklist
+            </button>
+          </div>
+        </form>
+
+        <hr />
+        <div class="text-center">
+          <button id="generateExcel" class="btn btn-success-tech">
+            <i class="fas fa-file-excel"></i> Gerar Excel
+          </button>
+        </div>
+      </div>
     </div>
-    <span class="ml-2">Salvo!</span>
   </div>
 
   <!-- jQuery e Bootstrap JS -->
-  <script
-    src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
-  ></script>
-  <script
-    src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
-  ></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <!-- SheetJS para exportação -->
-  <script
-    src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
-  ></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <!-- Script personalizado -->
   <script src="js/script.js"></script>
 </body>

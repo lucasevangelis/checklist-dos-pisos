@@ -1,123 +1,212 @@
 /* ===== FONTE E BACKGROUND GERAL ===== */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: 'Roboto', sans-serif;
-    /* Fundo gradiente escuro, estilo tech */
-    background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
-    min-height: 100vh;
-  }
-  
-  /* ===== CONTAINER PRINCIPAL (GLASSMORPHISM) ===== */
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(135deg, #141E30 0%, #243B55 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== Container (Mobile-first) ===== */
+.app-container {
+  max-width: 500px;
+  margin: auto;
+}
+
+/* ===== Glassmorphism Card ===== */
+.tech-container {
+  background-color: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  padding: 1.5rem;
+  border-radius: 15px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.tech-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.6);
+}
+
+/* ===== Título e Texto ===== */
+.text-light-tech {
+  color: #48CAE4;
+  text-shadow: 0 0 5px rgba(72, 202, 228, 0.5);
+}
+
+/* ===== Botões ===== */
+.btn-tech {
+  background-color: #00FFCB;
+  color: #000;
+  border-radius: 25px;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  transition: background-color 0.3s, transform 0.3s;
+}
+.btn-tech:hover {
+  background-color: #00bfa6;
+  transform: translateY(-2px);
+}
+.btn-success-tech {
+  background-color: #28a745;
+  border: none;
+  border-radius: 25px;
+  padding: 0.75rem 1.25rem;
+  color: #fff;
+  transition: background-color 0.3s, transform 0.3s;
+}
+.btn-success-tech:hover {
+  background-color: #218838;
+  transform: translateY(-2px);
+}
+
+/* ===== Tabela ===== */
+.table-dark {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  color: #fff !important;
+  border-color: #444 !important;
+}
+.thead-tech th {
+  background-color: #2c5364;
+  color: #fff;
+  text-align: center;
+  vertical-align: middle;
+  padding: 0.75rem;
+}
+.table-dark th:nth-child(2),
+.table-dark td:nth-child(2) {
+  min-width: 90px;
+}
+select.form-control {
+  background-color: #444;
+  color: #fff;
+  border: none;
+}
+
+/* ===== Toast ===== */
+.toast {
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+.toast.show {
+  opacity: 1;
+}
+
+/* ===== Splash Screen ===== */
+#splash {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #243B55;
+  z-index: 1100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: opacity 0.8s ease;
+}
+
+/* ===== Logo Avançado: "Pisos" 3D + Check ===== */
+.floor-advanced-logo {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  animation: logo-pulse 2s infinite;
+  transform-style: preserve-3d;
+}
+
+/* Pilha de "pisos" em 3D */
+.floor-stack {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  perspective: 500px;
+}
+.layer {
+  position: absolute;
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, #00FFCB, #48CAE4);
+  box-shadow: 0 0 15px rgba(72, 202, 228, 0.5);
+  transform-origin: center;
+  border-radius: 6px;
+  animation: layer-floating 3s ease-in-out infinite alternate;
+}
+.layer1 {
+  top: 20px; left: 20px;
+  transform: rotateX(15deg) rotateY(10deg) translateZ(0);
+}
+.layer2 {
+  top: 15px; left: 15px;
+  transform: rotateX(15deg) rotateY(5deg) translateZ(-10px);
+}
+.layer3 {
+  top: 10px; left: 10px;
+  transform: rotateX(15deg) rotateY(0deg) translateZ(-20px);
+}
+@keyframes layer-floating {
+  0% { transform: rotateX(15deg) rotateY(5deg) translateZ(-10px); }
+  100% { transform: rotateX(15deg) rotateY(5deg) translateZ(-15px) translateY(-5px); }
+}
+
+/* Bolha com check no canto */
+.check-bubble {
+  position: absolute;
+  width: 60px; height: 60px;
+  bottom: 0; right: 0;
+}
+.bubble {
+  position: relative;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+.check-stem {
+  position: absolute;
+  width: 6px; height: 28px;
+  background: #48CAE4;
+  border-radius: 3px;
+  transform: rotate(45deg);
+  left: 22px; top: 10px;
+}
+.check-kick {
+  position: absolute;
+  width: 6px; height: 14px;
+  background: #48CAE4;
+  border-radius: 3px;
+  transform: rotate(-45deg);
+  left: 25px; top: 23px;
+}
+
+/* Pulso geral do logo */
+@keyframes logo-pulse {
+  0% { transform: scale(0.95); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(0.95); }
+}
+
+/* ===== Wizard Steps (transição suave) ===== */
+.wizard-step {
+  animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== Responsividade ===== */
+@media (max-width: 576px) {
   .tech-container {
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
+    margin: 0;
+    padding: 1rem;
   }
-  
-  /* ===== TÍTULOS E TEXTOS ===== */
-  .text-light-tech {
-    color: #48CAE4;
-    text-shadow: 0 0 5px rgba(72, 202, 228, 0.5);
-    margin-top: 0;
-  }
-  
-  /* ===== BOTÕES ===== */
-  .btn-tech {
-    background-color: #00FFCB;
-    color: #000;
-    border-radius: 25px;
-    padding: 10px 20px;
-    border: none;
-    transition: 0.3s;
-  }
-  .btn-tech:hover {
-    background-color: #00bfa6;
-  }
-  
+  .btn-tech,
   .btn-success-tech {
-    background-color: #28a745;
-    border: none;
-    border-radius: 25px;
-    padding: 10px 20px;
-    color: #fff;
-    transition: 0.3s;
-  }
-  .btn-success-tech:hover {
-    background-color: #218838;
-  }
-  
-  /* ===== TABELA ===== */
-  .table-dark {
-    background-color: rgba(0, 0, 0, 0.5) !important;
-    color: #fff !important;
-    border-color: #444 !important;
-  }
-  .thead-tech th {
-    background-color: #2c5364;
-    color: #fff;
-    text-align: center;
-    vertical-align: middle;
-  }
-  
-  /* ============== CORREÇÃO ROBUSTA PARA A COLUNA PISO ============== */
-  /* Define uma largura mínima para a segunda coluna (Piso) */
-  .table-dark th:nth-child(2),
-  .table-dark td:nth-child(2) {
-    min-width: 90px; /* Ajuste conforme necessário */
-  }
-  
-  /* Ajusta o <select> para ter cor de fundo e texto visíveis */
-  select.form-control.piso-select {
-    background-color: #444;
-    color: #fff;
     width: 100%;
-    min-width: 80px;
+    margin-bottom: 10px;
   }
-  
-  /* ===== ÍCONE DE SALVAMENTO NO CANTO SUPERIOR DIREITO ===== */
-  #saveStatus {
-    position: fixed;
-    top: 15px;
-    right: 15px;
-    display: flex;
-    align-items: center;
-    background-color: #2c5364;
-    color: #fff;
-    padding: 8px 12px;
-    border-radius: 20px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-    z-index: 9999;
+  #logoutBtn {
+    position: static;
+    margin-top: 10px;
   }
-  #saveStatus.show {
-    opacity: 1;
-  }
-  .text-neon {
-    color: #00FFCB !important;
-  }
-  
-  /* ===== MELHORIAS DE RESPONSIVIDADE ===== */
-  @media (max-width: 576px) {
-    /* Reduz margens e padding no mobile */
-    .tech-container {
-      margin: 0;
-      padding: 1rem;
-    }
-  
-    /* Botões ficam 100% de largura e empilhados */
-    .btn-tech,
-    .btn-success-tech {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-  
-    /* Ajustes para o logout */
-    #logoutBtn {
-      position: static;
-      margin-top: 10px;
-    }
-  }
-  
+}
