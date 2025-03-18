@@ -2,24 +2,23 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <!-- Para comportamento como aplicativo no mobile -->
+  <!-- Configuração para dispositivos móveis -->
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   
   <title>Checklist dos Pisos</title>
-  <!-- Favicon (opcional) -->
   <link rel="icon" href="assets/images/floor_icon.png" type="image/png" />
 
-  <!-- Bootstrap CSS via CDN (v4.5.2) -->
+  <!-- Bootstrap CSS via CDN -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-  <!-- Font Awesome para ícones (opcional) -->
+  <!-- Font Awesome para ícones -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
-  <!-- CSS personalizado -->
+  <!-- CSS Personalizado -->
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- Toast de feedback -->
+  <!-- Toast para feedback -->
   <div aria-live="polite" aria-atomic="true" style="position: fixed; top: 20px; right: 20px; z-index: 1050;">
     <div id="toastMsg" class="toast" data-delay="1500">
       <div class="toast-body bg-info text-white">
@@ -28,9 +27,8 @@
     </div>
   </div>
 
-  <!-- Splash Screen (exibe um logo em CSS no centro e depois remove) -->
+  <!-- Splash Screen com logo avançado (3D + Check) -->
   <div id="splash" class="d-flex justify-content-center align-items-center">
-    <!-- Logo em CSS avançado (pisos 3D + check) -->
     <div class="floor-advanced-logo">
       <div class="floor-stack">
         <div class="layer layer1"></div>
@@ -70,11 +68,11 @@
     </div>
   </div>
 
-  <!-- Container do "Wizard" (passos) -->
+  <!-- Container do Wizard (formulário passo a passo) -->
   <div id="wizardContainer" class="container-fluid mt-4 px-2 app-container" style="display: none;">
     <div class="card shadow-lg rounded tech-container mx-auto">
       <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
           <h2 class="text-light-tech text-center w-100 mb-0">
             <i class="fas fa-list-ul"></i> Adicionar ao Checklist
           </h2>
@@ -83,7 +81,7 @@
           </button>
         </div>
 
-        <!-- "Passos" do formulário (wizard) -->
+        <!-- Wizard: Formulário em 4 passos -->
         <form id="wizardForm">
           <!-- Passo 1: Data -->
           <div class="wizard-step" id="step1">
@@ -138,6 +136,13 @@
         <div class="text-center">
           <button id="generateExcel" class="btn btn-success-tech">
             <i class="fas fa-file-excel"></i> Gerar Excel
+          </button>
+          <button id="clearData" class="btn btn-warning btn-sm ml-2">
+            <i class="fas fa-trash-alt"></i> Limpar Checklist
+          </button>
+          <!-- Novo botão "Início" para retornar ao passo 1 -->
+          <button id="btnInicio" class="btn btn-info btn-sm ml-2">
+            <i class="fas fa-home"></i> Início
           </button>
         </div>
       </div>
