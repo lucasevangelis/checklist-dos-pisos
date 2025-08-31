@@ -14,8 +14,15 @@ body {
    APP CONTAINER (Centraliza e limita o conteúdo)
 ================================= */
 .app-container {
-  max-width: 500px;
+  max-width: 500px; /* Largura padrão para mobile-first */
   margin: auto;
+  transition: max-width 0.4s ease-in-out;
+}
+/* Aumenta a largura em telas maiores para o layout de duas colunas */
+@media (min-width: 992px) {
+  .app-container {
+    max-width: 1100px;
+  }
 }
 
 /* ==============================
@@ -218,14 +225,99 @@ select.form-control {
 }
 
 /* ==============================
-   Wizard Steps (fadeIn)
+   Wizard Steps (Slide Transitions)
 ================================= */
-.wizard-step {
-  animation: fadeIn 0.4s ease;
+.wizard-steps-container {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
 }
+.wizard-step {
+  min-width: 100%;
+  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+  /* Oculta os passos inativos */
+  display: none;
+}
+.wizard-step.active {
+  /* Mostra o passo ativo */
+  display: block;
+  animation: fadeIn 0.5s ease-in-out; /* Reutiliza o fadeIn para o passo que se torna ativo */
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilização da Barra de Progresso */
+.progress {
+  height: 20px;
+  background-color: #34495e;
+  border-radius: 10px;
+}
+.progress-bar {
+  font-weight: 500;
+  transition: width 0.5s ease-in-out;
+}
+
+/* ==============================
+   CHECKLIST TABLE
+================================= */
+.checklist-table-container {
+  max-height: 300px;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+#checklistTable td, #checklistTable th {
+  vertical-align: middle;
+  text-align: center;
+}
+#checklistTable .btn-danger {
+  background-color: #dc3545;
+  border: none;
+  border-radius: 15px;
+  transition: background-color 0.3s;
+}
+#checklistTable .btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Animações para as linhas da tabela */
+@keyframes fadeInRow {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+.fade-in-row {
+  animation: fadeInRow 0.4s ease-out;
+}
+@keyframes fadeOutRow {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.9); }
+}
+.fade-out-row {
+  animation: fadeOutRow 0.3s ease-in;
+}
+
+/* ==============================
+   LAYOUT DE DUAS COLUNAS (Desktop)
+================================= */
+@media (min-width: 992px) {
+  .main-layout {
+    display: flex;
+    gap: 2rem;
+  }
+  .form-column {
+    flex: 1 1 45%;
+  }
+  .table-column {
+    flex: 1 1 55%;
+    display: flex;
+    flex-direction: column;
+  }
+  .checklist-table-container {
+    flex-grow: 1; /* Faz a tabela ocupar o espaço disponível */
+    max-height: 450px; /* Aumenta a altura máxima em desktop */
+  }
 }
 
 /* ==============================
