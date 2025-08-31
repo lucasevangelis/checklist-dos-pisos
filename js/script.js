@@ -44,9 +44,43 @@ async function initializeDefaultUsers() {
 // Variável global para o usuário logado
 let loggedUser = null;
 
-// Exibe um toast de feedback (Bootstrap Toast)
-function showToast(message) {
+// Função para exibir um modal de confirmação genérico
+function showConfirmModal(body, onConfirm) {
+  const modal = $('#confirmModal');
+  modal.find('#confirmModalBody').text(body);
+  modal.modal('show');
+
+  // Remove listeners antigos para evitar múltiplas execuções
+  $('#confirmModalConfirm').off('click');
+
+  $('#confirmModalConfirm').on('click', () => {
+    onConfirm();
+    modal.modal('hide');
+  });
+}
+
+// Exibe um toast de feedback (Info)
+function showInfoToast(message) {
   const toastElem = document.getElementById("toastMsg");
+  toastElem.querySelector(".toast-body").textContent = message;
+  $(toastElem).toast('show');
+}
+
+// Ativa/desativa o estado de loading de um botão
+function setButtonLoading(button, isLoading) {
+  if (isLoading) {
+    button.disabled = true;
+    button.dataset.originalHtml = button.innerHTML;
+    button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Gerando...`;
+  } else {
+    button.disabled = false;
+    button.innerHTML = button.dataset.originalHtml;
+  }
+}
+
+// Exibe um toast de feedback (Erro)
+function showErrorToast(message) {
+  const toastElem = document.getElementById("toastError");
   toastElem.querySelector(".toast-body").textContent = message;
   $(toastElem).toast('show');
 }
@@ -67,7 +101,7 @@ function removeSplash() {
 function saveTableData() {
   if (!loggedUser) return;
   localStorage.setItem("checklistData_" + loggedUser, JSON.stringify(checklistArray));
-  showToast("Salvo!");
+  showInfoToast("Checklist salvo!");
 }
 
 // Carrega os dados do checklist do localStorage e atualiza o array
@@ -82,35 +116,51 @@ function loadTableData() {
 
 // Limpa todos os dados salvos do checklist
 function clearChecklistData() {
-  if (confirm("Deseja realmente apagar todos os dados salvos? Esta ação não poderá ser desfeita.")) {
+  const message = "Deseja realmente apagar todos os dados salvos? Esta ação não poderá ser desfeita.";
+  showConfirmModal(message, () => {
     localStorage.removeItem("checklistData_" + loggedUser);
     checklistArray = [];
     renderChecklistTable();
-    showToast("Dados apagados!");
-  }
+    showInfoToast("Checklist apagado com sucesso!");
+  });
 }
 
-// Renderiza o checklist em uma tabela (para visualização interna)
+// Renderiza o checklist na tabela visível para o usuário
 function renderChecklistTable() {
   const tbody = document.querySelector("#checklistTable tbody");
-  tbody.innerHTML = "";
-  checklistArray.forEach(entry => {
+  // Adicionado para evitar erro se a tabela não estiver na página
+  if (!tbody) {
+    console.error("Elemento tbody da tabela de checklist não foi encontrado!");
+    return;
+  }
+  tbody.innerHTML = ""; // Limpa a tabela antes de renderizar
+  checklistArray.forEach((entry, index) => {
     const tr = document.createElement("tr");
+    // Adiciona um efeito de fade-in para a nova linha
+    tr.className = "fade-in-row";
+
+    // Cria as células para Data, Piso, Posição, Observação
     entry.forEach(item => {
       const td = document.createElement("td");
       td.textContent = item;
       tr.appendChild(td);
     });
-    // Botão para remover linha individual
+
+    // Cria a célula de Ação com o botão de remover
     const tdAction = document.createElement("td");
     const btnRemove = document.createElement("button");
-    btnRemove.textContent = "Remover";
+    btnRemove.innerHTML = '<i class="fas fa-trash-alt"></i>'; // Ícone de lixeira
     btnRemove.className = "btn btn-danger btn-sm";
+    btnRemove.setAttribute("title", "Remover esta entrada");
     btnRemove.addEventListener("click", () => {
-      checklistArray = checklistArray.filter(e => e !== entry);
-      saveTableData();
-      renderChecklistTable();
-      showToast("Entrada removida.");
+      // Adiciona uma animação de fade-out antes de remover
+      tr.classList.add("fade-out-row");
+      setTimeout(() => {
+        checklistArray.splice(index, 1); // Remove o item pelo índice
+        saveTableData();
+        renderChecklistTable(); // Re-renderiza a tabela
+        showInfoToast("Entrada removida.");
+      }, 300); // Espera a animação terminar
     });
     tdAction.appendChild(btnRemove);
     tr.appendChild(tdAction);
@@ -124,15 +174,25 @@ function capitalizeFirstLetter(text) {
   return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
-// Wizard: Mostra o passo desejado
+// Atualiza a barra de progresso do wizard
+function updateWizardProgress(step) {
+  const progressBar = document.getElementById("wizardProgressBar");
+  const progress = (step / 4) * 100;
+  progressBar.style.width = `${progress}%`;
+  progressBar.setAttribute("aria-valuenow", progress);
+  progressBar.textContent = `Passo ${step} de 4`;
+}
+
+// Wizard: Mostra o passo desejado com transição
 function showStep(step) {
   const steps = document.querySelectorAll(".wizard-step");
   steps.forEach(el => {
-    el.style.display = "none";
+    el.classList.remove("active");
   });
   const targetStep = document.getElementById("step" + step);
   if (targetStep) {
-    targetStep.style.display = "block";
+    targetStep.classList.add("active");
+    updateWizardProgress(step);
   } else {
     console.error("Elemento não encontrado para o passo: step" + step);
   }
@@ -143,7 +203,7 @@ function showStep(step) {
 function nextStep1() {
   const wizDate = document.getElementById("wizDate");
   if (!wizDate.value) {
-    alert("Selecione a data.");
+    showErrorToast("Por favor, selecione a data.");
     wizDate.focus();
     return;
   }
@@ -155,7 +215,7 @@ function nextStep2() {
 function nextStep3() {
   const wizPosicao = document.getElementById("wizPosicao");
   if (!/^\d+$/.test(wizPosicao.value)) {
-    alert("Apenas números são permitidos na coluna Posição. Corrija o valor.");
+    showErrorToast("Apenas números são permitidos na Posição.");
     wizPosicao.focus();
     return;
   }
@@ -181,12 +241,12 @@ function addEntry() {
   let wizObs = wizObsElem.value.trim();
 
   if (!wizDate) {
-    alert("A data é obrigatória.");
+    showErrorToast("A data é obrigatória.");
     wizDateElem.focus();
     return;
   }
   if (!/^\d+$/.test(wizPosicao)) {
-    alert("Apenas números são permitidos na coluna Posição. Corrija o valor.");
+    showErrorToast("Apenas números são permitidos na Posição.");
     wizPosicaoElem.focus();
     return;
   }
@@ -196,7 +256,7 @@ function addEntry() {
 
   checklistArray.push([wizDate, wizPiso, wizPosicao, wizObs]);
   saveTableData();
-  renderChecklistTable();
+  renderChecklistTable(); // <-- This was already here, my mistake. But the logic inside renderChecklistTable is now improved.
 
   // Limpa os campos de Piso, Posição e Observação (mantém Data)
   wizPisoElem.value = "2";
@@ -205,23 +265,37 @@ function addEntry() {
 
   // Retorna ao início do wizard
   goToInicio();
-  showToast("Entrada adicionada com sucesso!");
+  showInfoToast("Entrada adicionada com sucesso!");
 }
 
 // Gera o Excel a partir do checklistArray
 function generateExcel() {
   if (checklistArray.length === 0) {
-    showToast("Nenhuma entrada no checklist!");
+    showErrorToast("Nenhuma entrada no checklist para gerar.");
     return;
   }
-  const data = [];
-  const headers = ["Data", "Piso", "Posição", "Observação"];
-  data.push(headers);
-  checklistArray.forEach(item => data.push(item));
-  const ws = XLSX.utils.aoa_to_sheet(data);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Checklist");
-  XLSX.writeFile(wb, "checklist.xlsx");
+
+  const btn = document.getElementById("generateExcel");
+  setButtonLoading(btn, true);
+
+  // Usa setTimeout para dar tempo da UI atualizar antes de travar com a geração do arquivo
+  setTimeout(() => {
+    try {
+      const data = [];
+      const headers = ["Data", "Piso", "Posição", "Observação"];
+      data.push(headers);
+      checklistArray.forEach(item => data.push(item));
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Checklist");
+      XLSX.writeFile(wb, "checklist.xlsx");
+    } catch (error) {
+      console.error("Erro ao gerar Excel:", error);
+      showErrorToast("Ocorreu um erro ao gerar o arquivo Excel.");
+    } finally {
+      setButtonLoading(btn, false);
+    }
+  }, 200); // 200ms de delay
 }
 
 // Função para tratar o login/registro do usuário
@@ -230,23 +304,24 @@ async function handleLogin(e) {
   const userInput = document.getElementById("username").value.trim();
   const passInput = document.getElementById("password").value;
   if (!userInput || !passInput) {
-    showToast("Preencha usuário e senha.");
+    showErrorToast("Preencha usuário e senha.");
     return;
   }
   let users = localStorage.getItem("users");
   users = users ? JSON.parse(users) : {};
   const hashedInput = await hashPassword(passInput);
   if (!users[userInput]) {
-    if (confirm("Usuário não encontrado. Deseja registrá-lo?")) {
+    const message = "Usuário não encontrado. Deseja registrá-lo com os dados inseridos?";
+    showConfirmModal(message, () => {
       users[userInput] = hashedInput;
       localStorage.setItem("users", JSON.stringify(users));
-      showToast("Usuário registrado com sucesso!");
-    } else {
-      return;
-    }
+      showInfoToast("Usuário registrado com sucesso! Faça o login agora.");
+      // Limpa os campos para o usuário tentar logar novamente
+      document.getElementById("password").value = "";
+    });
   } else {
     if (users[userInput] !== hashedInput) {
-      showToast("Senha incorreta. Tente novamente.");
+      showErrorToast("Senha incorreta. Tente novamente.");
       return;
     }
   }
@@ -291,8 +366,9 @@ window.addEventListener("load", async function() {
       loggedUser = user;
       document.getElementById("wizardContainer").style.display = "block";
       loadTableData();
-      renderChecklistTable();
+      // renderChecklistTable() é chamado dentro de loadTableData se houver dados
       setDefaultDate();
+      showStep(1); // Inicia o wizard no primeiro passo
     }
   }, 2000);
 });
