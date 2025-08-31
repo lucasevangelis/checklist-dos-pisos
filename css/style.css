@@ -63,7 +63,7 @@ body {
 }
 .btn-tech:hover {
   background-color: #00bfa6;
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); <- Removido para GSAP */
 }
 .btn-success-tech {
   background-color: #28a745;
@@ -75,7 +75,7 @@ body {
 }
 .btn-success-tech:hover {
   background-color: #218838;
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); <- Removido para GSAP */
 }
 #clearData {
   background-color: #ffc107;
@@ -87,7 +87,7 @@ body {
 }
 #clearData:hover {
   background-color: #e0a800;
-  transform: translateY(-2px);
+  /* transform: translateY(-2px); <- Removido para GSAP */
 }
 
 /* ==============================
@@ -150,7 +150,7 @@ select.form-control {
   width: 120px;
   height: 120px;
   transform-style: preserve-3d;
-  animation: logo-pulse 2s infinite;
+  /* animation: logo-pulse 2s infinite; <- Removido para controle via GSAP */
 }
 .floor-stack {
   position: absolute;
@@ -168,7 +168,7 @@ select.form-control {
   background: linear-gradient(135deg, #00FFCB, #48CAE4);
   border-radius: 6px;
   box-shadow: 0 0 10px rgba(72, 202, 228, 0.6);
-  animation: layer-floating 3s ease-in-out infinite alternate;
+  /* animation: layer-floating 3s ease-in-out infinite alternate; <- Removido */
 }
 .layer1 {
   transform: rotateX(15deg) rotateY(10deg) translateZ(0);
@@ -179,10 +179,7 @@ select.form-control {
 .layer3 {
   transform: rotateX(15deg) rotateY(0deg) translateZ(-20px);
 }
-@keyframes layer-floating {
-  0% { transform: rotateX(15deg) rotateY(5deg) translateZ(-10px); }
-  100% { transform: rotateX(15deg) rotateY(5deg) translateZ(-15px) translateY(-5px); }
-}
+/* @keyframes layer-floating removido */
 .check-bubble {
   position: absolute;
   bottom: 0;
@@ -218,30 +215,27 @@ select.form-control {
   left: 25px;
   top: 23px;
 }
-@keyframes logo-pulse {
-  0% { transform: scale(0.95); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(0.95); }
-}
+/* @keyframes logo-pulse removido */
 
 /* ==============================
-   Wizard Steps (Slide Transitions)
+   Wizard Steps (GSAP-Powered)
 ================================= */
+.wizard-steps-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
 .wizard-steps-container {
   display: flex;
-  transition: transform 0.5s ease-in-out;
+  width: 400%; /* 4 steps * 100% width */
 }
 .wizard-step {
-  min-width: 100%;
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-  /* Oculta os passos inativos */
-  display: none;
+  width: 25%; /* 100% / 4 steps */
+  flex-shrink: 0;
+  padding: 0 5px; /* Pequeno espaçamento para evitar toques acidentais */
 }
-.wizard-step.active {
-  /* Mostra o passo ativo */
-  display: block;
-  animation: fadeIn 0.5s ease-in-out; /* Reutiliza o fadeIn para o passo que se torna ativo */
-}
+/* A animação agora é controlada inteiramente pelo GSAP,
+   não precisamos mais das classes .active ou display:none aqui */
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }

@@ -100,11 +100,13 @@
                 </div>
               </div>
 
-              <!-- Container para os Passos (para transições) -->
-              <div class="wizard-steps-container">
-                <!-- Passo 1: Data -->
-                <div class="wizard-step" id="step1">
-                  <label for="wizDate" class="text-light-tech">Data</label>
+              <!-- Wrapper para o Container de Passos (para overflow:hidden) -->
+              <div class="wizard-steps-wrapper">
+                <!-- Container para os Passos (para transições) -->
+                <div class="wizard-steps-container">
+                  <!-- Passo 1: Data -->
+                  <div class="wizard-step" id="step1">
+                    <label for="wizDate" class="text-light-tech">Data</label>
                   <input type="date" class="form-control mb-3" id="wizDate" required />
                   <button type="button" class="btn btn-tech float-right" id="nextStep1">
                     Próximo <i class="fas fa-arrow-right"></i>
@@ -149,6 +151,7 @@
                     <i class="fas fa-check"></i> Adicionar ao Checklist
                   </button>
                 </div>
+                </div>
               </div>
             </form>
           </div>
@@ -190,6 +193,8 @@
     </div>
   </div>
 
+  <!-- GSAP para Animações -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
   <!-- jQuery e Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

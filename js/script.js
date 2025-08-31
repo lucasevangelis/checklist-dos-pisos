@@ -1,7 +1,10 @@
-// Array local para armazenar as entradas do checklist
-let checklistArray = [];
+(function() {
+  "use strict"; // Ativa o modo estrito para um código mais limpo
 
-// Função para gerar hash SHA‑256 de uma senha
+  // Array local para armazenar as entradas do checklist
+  let checklistArray = [];
+
+  // Função para gerar hash SHA‑256 de uma senha
 async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -66,6 +69,36 @@ function showInfoToast(message) {
   $(toastElem).toast('show');
 }
 
+// Adiciona micro-interações aos elementos da UI
+function applyMicroInteractions() {
+  // Animação de hover para botões
+  document.querySelectorAll(".btn").forEach(btn => {
+    // Evita aplicar a animação no botão de "loading"
+    if(btn.dataset.originalHtml) return;
+
+    btn.addEventListener("mouseenter", () => gsap.to(btn, { duration: 0.2, scale: 1.05, y: -2, ease: "power1.out" }));
+    btn.addEventListener("mouseleave", () => gsap.to(btn, { duration: 0.2, scale: 1, y: 0, ease: "power1.out" }));
+  });
+
+  // Animação de foco para inputs
+  document.querySelectorAll(".form-control").forEach(input => {
+    input.addEventListener("focus", () => {
+      gsap.to(input, {
+        duration: 0.3,
+        boxShadow: "0 0 15px rgba(72, 202, 228, 0.6)",
+        ease: "power2.out"
+      });
+    });
+    input.addEventListener("blur", () => {
+      gsap.to(input, {
+        duration: 0.3,
+        boxShadow: "0 0 0 rgba(72, 202, 228, 0)",
+        ease: "power2.out"
+      });
+    });
+  });
+}
+
 // Ativa/desativa o estado de loading de um botão
 function setButtonLoading(button, isLoading) {
   if (isLoading) {
@@ -85,16 +118,44 @@ function showErrorToast(message) {
   $(toastElem).toast('show');
 }
 
-// Remove o splash screen com fade out
-function removeSplash() {
+// Animação do Splash Screen com GSAP
+function animateSplashScreen(onComplete) {
   const splash = document.getElementById("splash");
-  if (splash) {
-    splash.style.opacity = '0';
-    splash.style.pointerEvents = 'none';
-    setTimeout(() => {
-      splash.remove();
-    }, 1000);
+  if (!splash) {
+    onComplete();
+    return;
   }
+
+  const tl = gsap.timeline({ onComplete: onComplete });
+  const layers = ".floor-stack .layer";
+  const check = ".check-bubble";
+
+  tl.from(layers, {
+      duration: 1,
+      y: -50,
+      opacity: 0,
+      stagger: 0.2,
+      ease: "bounce.out"
+    })
+    .from(check, {
+      duration: 0.5,
+      scale: 0,
+      opacity: 0,
+      ease: "back.out(1.7)"
+    }, "-=0.5")
+    .to(splash, {
+      duration: 0.8,
+      opacity: 0,
+      delay: 0.5,
+      onComplete: () => splash.remove()
+    });
+}
+
+// Remove o splash screen com fade out (agora controlado por GSAP)
+function removeSplash() {
+  // A função removeSplash agora é um wrapper para a animação do GSAP,
+  // ou pode ser removida se a animação for chamada diretamente.
+  // Por enquanto, a lógica está em animateSplashScreen.
 }
 
 // Persiste o checklist no localStorage para o usuário logado
@@ -136,8 +197,6 @@ function renderChecklistTable() {
   tbody.innerHTML = ""; // Limpa a tabela antes de renderizar
   checklistArray.forEach((entry, index) => {
     const tr = document.createElement("tr");
-    // Adiciona um efeito de fade-in para a nova linha
-    tr.className = "fade-in-row";
 
     // Cria as células para Data, Piso, Posição, Observação
     entry.forEach(item => {
@@ -183,19 +242,20 @@ function updateWizardProgress(step) {
   progressBar.textContent = `Passo ${step} de 4`;
 }
 
-// Wizard: Mostra o passo desejado com transição
+// Wizard: Mostra o passo desejado com animação de slide GSAP
 function showStep(step) {
-  const steps = document.querySelectorAll(".wizard-step");
-  steps.forEach(el => {
-    el.classList.remove("active");
+  const container = document.querySelector(".wizard-steps-container");
+
+  // Calcula o deslocamento. step 1 = 0%, step 2 = -100%, etc.
+  const offset = (step - 1) * -100;
+
+  gsap.to(container, {
+    duration: 0.6,
+    xPercent: offset,
+    ease: "power2.inOut"
   });
-  const targetStep = document.getElementById("step" + step);
-  if (targetStep) {
-    targetStep.classList.add("active");
-    updateWizardProgress(step);
-  } else {
-    console.error("Elemento não encontrado para o passo: step" + step);
-  }
+
+  updateWizardProgress(step);
   currentStep = step;
 }
 
@@ -256,7 +316,14 @@ function addEntry() {
 
   checklistArray.push([wizDate, wizPiso, wizPosicao, wizObs]);
   saveTableData();
-  renderChecklistTable(); // <-- This was already here, my mistake. But the logic inside renderChecklistTable is now improved.
+  renderChecklistTable();
+
+  // Anima a nova linha que foi adicionada à tabela
+  const tableRows = document.querySelectorAll("#checklistTable tbody tr");
+  if (tableRows.length > 0) {
+    const newRow = tableRows[tableRows.length - 1];
+    gsap.from(newRow, { duration: 0.5, opacity: 0, y: 20, ease: "power2.out" });
+  }
 
   // Limpa os campos de Piso, Posição e Observação (mantém Data)
   wizPisoElem.value = "2";
@@ -356,19 +423,26 @@ document.getElementById("btnInicio").addEventListener("click", goToInicio);
 // Ao carregar a página
 window.addEventListener("load", async function() {
   await initializeDefaultUsers();
-  // Remover o splash após 2 segundos e exibir login ou wizard conforme o usuário
-  setTimeout(() => {
-    removeSplash();
+
+  // Inicia a animação do splash screen e, ao concluir, exibe o conteúdo principal
+  animateSplashScreen(() => {
     const user = sessionStorage.getItem("loggedUser");
+    const loginContainer = document.getElementById("loginContainer");
+    const wizardContainer = document.getElementById("wizardContainer");
+
     if (!user) {
-      document.getElementById("loginContainer").style.display = "block";
+      loginContainer.style.display = "block";
+      gsap.from(loginContainer, { duration: 0.5, opacity: 0, y: 20 });
     } else {
       loggedUser = user;
-      document.getElementById("wizardContainer").style.display = "block";
+      wizardContainer.style.display = "block";
+      gsap.from(wizardContainer, { duration: 0.5, opacity: 0, y: 20 });
       loadTableData();
-      // renderChecklistTable() é chamado dentro de loadTableData se houver dados
       setDefaultDate();
       showStep(1); // Inicia o wizard no primeiro passo
     }
-  }, 2000);
+    // Aplica as animações de micro-interação depois que a UI principal estiver visível
+    applyMicroInteractions();
+  });
 });
+})();
