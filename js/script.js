@@ -44,6 +44,20 @@ async function initializeDefaultUsers() {
 // Variável global para o usuário logado
 let loggedUser = null;
 
+// Exibe um toast de feedback (Info)
+function showInfoToast(message) {
+  const toastElem = document.getElementById("toastMsg");
+  toastElem.querySelector(".toast-body").textContent = message;
+  $(toastElem).toast('show');
+}
+
+// Exibe um toast de feedback (Erro)
+function showErrorToast(message) {
+  const toastElem = document.getElementById("toastError");
+  toastElem.querySelector(".toast-body").textContent = message;
+  $(toastElem).toast('show');
+}
+
 // Função para exibir um modal de confirmação genérico
 function showConfirmModal(body, onConfirm) {
   const modal = $('#confirmModal');
@@ -59,42 +73,37 @@ function showConfirmModal(body, onConfirm) {
   });
 }
 
-// Exibe um toast de feedback (Info)
-function showInfoToast(message) {
-  const toastElem = document.getElementById("toastMsg");
-  toastElem.querySelector(".toast-body").textContent = message;
-  $(toastElem).toast('show');
-}
-
-// Ativa/desativa o estado de loading de um botão
-function setButtonLoading(button, isLoading) {
-  if (isLoading) {
-    button.disabled = true;
-    button.dataset.originalHtml = button.innerHTML;
-    button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Gerando...`;
-  } else {
-    button.disabled = false;
-    button.innerHTML = button.dataset.originalHtml;
-  }
-}
-
-// Exibe um toast de feedback (Erro)
-function showErrorToast(message) {
-  const toastElem = document.getElementById("toastError");
-  toastElem.querySelector(".toast-body").textContent = message;
-  $(toastElem).toast('show');
-}
-
-// Remove o splash screen com fade out
-function removeSplash() {
+// Animação do Splash Screen com GSAP
+function animateSplashScreen(onComplete) {
   const splash = document.getElementById("splash");
-  if (splash) {
-    splash.style.opacity = '0';
-    splash.style.pointerEvents = 'none';
-    setTimeout(() => {
-      splash.remove();
-    }, 1000);
+  if (!splash) {
+    onComplete();
+    return;
   }
+
+  const tl = gsap.timeline({ onComplete: onComplete });
+  const layers = ".floor-stack .layer";
+  const check = ".check-bubble";
+
+  tl.from(layers, {
+      duration: 1,
+      y: -50,
+      opacity: 0,
+      stagger: 0.2,
+      ease: "bounce.out"
+    })
+    .from(check, {
+      duration: 0.5,
+      scale: 0,
+      opacity: 0,
+      ease: "back.out(1.7)"
+    }, "-=0.5")
+    .to(splash, {
+      duration: 0.8,
+      opacity: 0,
+      delay: 0.5,
+      onComplete: () => splash.remove()
+    });
 }
 
 // Persiste o checklist no localStorage para o usuário logado
@@ -125,42 +134,27 @@ function clearChecklistData() {
   });
 }
 
-// Renderiza o checklist na tabela visível para o usuário
+// Renderiza o checklist em uma tabela (para visualização interna)
 function renderChecklistTable() {
   const tbody = document.querySelector("#checklistTable tbody");
-  // Adicionado para evitar erro se a tabela não estiver na página
-  if (!tbody) {
-    console.error("Elemento tbody da tabela de checklist não foi encontrado!");
-    return;
-  }
-  tbody.innerHTML = ""; // Limpa a tabela antes de renderizar
-  checklistArray.forEach((entry, index) => {
+  tbody.innerHTML = "";
+  checklistArray.forEach(entry => {
     const tr = document.createElement("tr");
-    // Adiciona um efeito de fade-in para a nova linha
-    tr.className = "fade-in-row";
-
-    // Cria as células para Data, Piso, Posição, Observação
     entry.forEach(item => {
       const td = document.createElement("td");
       td.textContent = item;
       tr.appendChild(td);
     });
-
-    // Cria a célula de Ação com o botão de remover
+    // Botão para remover linha individual
     const tdAction = document.createElement("td");
     const btnRemove = document.createElement("button");
-    btnRemove.innerHTML = '<i class="fas fa-trash-alt"></i>'; // Ícone de lixeira
+    btnRemove.textContent = "Remover";
     btnRemove.className = "btn btn-danger btn-sm";
-    btnRemove.setAttribute("title", "Remover esta entrada");
     btnRemove.addEventListener("click", () => {
-      // Adiciona uma animação de fade-out antes de remover
-      tr.classList.add("fade-out-row");
-      setTimeout(() => {
-        checklistArray.splice(index, 1); // Remove o item pelo índice
-        saveTableData();
-        renderChecklistTable(); // Re-renderiza a tabela
-        showInfoToast("Entrada removida.");
-      }, 300); // Espera a animação terminar
+      checklistArray = checklistArray.filter(e => e !== entry);
+      saveTableData();
+      renderChecklistTable();
+      showInfoToast("Entrada removida.");
     });
     tdAction.appendChild(btnRemove);
     tr.appendChild(tdAction);
@@ -183,19 +177,20 @@ function updateWizardProgress(step) {
   progressBar.textContent = `Passo ${step} de 4`;
 }
 
-// Wizard: Mostra o passo desejado com transição
+// Wizard: Mostra o passo desejado com animação de slide GSAP
 function showStep(step) {
-  const steps = document.querySelectorAll(".wizard-step");
-  steps.forEach(el => {
-    el.classList.remove("active");
+  const container = document.querySelector(".wizard-steps-container");
+
+  // Calcula o deslocamento. step 1 = 0%, step 2 = -100%, etc.
+  const offset = (step - 1) * -100;
+
+  gsap.to(container, {
+    duration: 0.6,
+    xPercent: offset,
+    ease: "power2.inOut"
   });
-  const targetStep = document.getElementById("step" + step);
-  if (targetStep) {
-    targetStep.classList.add("active");
-    updateWizardProgress(step);
-  } else {
-    console.error("Elemento não encontrado para o passo: step" + step);
-  }
+
+  updateWizardProgress(step);
   currentStep = step;
 }
 
@@ -256,7 +251,7 @@ function addEntry() {
 
   checklistArray.push([wizDate, wizPiso, wizPosicao, wizObs]);
   saveTableData();
-  renderChecklistTable(); // <-- This was already here, my mistake. But the logic inside renderChecklistTable is now improved.
+  renderChecklistTable();
 
   // Limpa os campos de Piso, Posição e Observação (mantém Data)
   wizPisoElem.value = "2";
@@ -274,28 +269,14 @@ function generateExcel() {
     showErrorToast("Nenhuma entrada no checklist para gerar.");
     return;
   }
-
-  const btn = document.getElementById("generateExcel");
-  setButtonLoading(btn, true);
-
-  // Usa setTimeout para dar tempo da UI atualizar antes de travar com a geração do arquivo
-  setTimeout(() => {
-    try {
-      const data = [];
-      const headers = ["Data", "Piso", "Posição", "Observação"];
-      data.push(headers);
-      checklistArray.forEach(item => data.push(item));
-      const ws = XLSX.utils.aoa_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Checklist");
-      XLSX.writeFile(wb, "checklist.xlsx");
-    } catch (error) {
-      console.error("Erro ao gerar Excel:", error);
-      showErrorToast("Ocorreu um erro ao gerar o arquivo Excel.");
-    } finally {
-      setButtonLoading(btn, false);
-    }
-  }, 200); // 200ms de delay
+  const data = [];
+  const headers = ["Data", "Piso", "Posição", "Observação"];
+  data.push(headers);
+  checklistArray.forEach(item => data.push(item));
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Checklist");
+  XLSX.writeFile(wb, "checklist.xlsx");
 }
 
 // Função para tratar o login/registro do usuário
@@ -316,8 +297,7 @@ async function handleLogin(e) {
       users[userInput] = hashedInput;
       localStorage.setItem("users", JSON.stringify(users));
       showInfoToast("Usuário registrado com sucesso! Faça o login agora.");
-      // Limpa os campos para o usuário tentar logar novamente
-      document.getElementById("password").value = "";
+      document.getElementById("password").value = ""; // Limpa a senha para nova tentativa de login
     });
   } else {
     if (users[userInput] !== hashedInput) {
@@ -356,19 +336,23 @@ document.getElementById("btnInicio").addEventListener("click", goToInicio);
 // Ao carregar a página
 window.addEventListener("load", async function() {
   await initializeDefaultUsers();
-  // Remover o splash após 2 segundos e exibir login ou wizard conforme o usuário
-  setTimeout(() => {
-    removeSplash();
+
+  // Inicia a animação do splash screen e, ao concluir, exibe o conteúdo principal
+  animateSplashScreen(() => {
     const user = sessionStorage.getItem("loggedUser");
+    const loginContainer = document.getElementById("loginContainer");
+    const wizardContainer = document.getElementById("wizardContainer");
+
     if (!user) {
-      document.getElementById("loginContainer").style.display = "block";
+      loginContainer.style.display = "block";
+      gsap.from(loginContainer, { duration: 0.5, opacity: 0, y: 20 });
     } else {
       loggedUser = user;
-      document.getElementById("wizardContainer").style.display = "block";
+      wizardContainer.style.display = "block";
+      gsap.from(wizardContainer, { duration: 0.5, opacity: 0, y: 20 });
       loadTableData();
-      // renderChecklistTable() é chamado dentro de loadTableData se houver dados
       setDefaultDate();
       showStep(1); // Inicia o wizard no primeiro passo
     }
-  }, 2000);
+  });
 });

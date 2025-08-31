@@ -14,15 +14,8 @@ body {
    APP CONTAINER (Centraliza e limita o conteúdo)
 ================================= */
 .app-container {
-  max-width: 500px; /* Largura padrão para mobile-first */
+  max-width: 500px;
   margin: auto;
-  transition: max-width 0.4s ease-in-out;
-}
-/* Aumenta a largura em telas maiores para o layout de duas colunas */
-@media (min-width: 992px) {
-  .app-container {
-    max-width: 1100px;
-  }
 }
 
 /* ==============================
@@ -150,7 +143,7 @@ select.form-control {
   width: 120px;
   height: 120px;
   transform-style: preserve-3d;
-  animation: logo-pulse 2s infinite;
+  /* animation: logo-pulse 2s infinite; <- Removido para controle via GSAP */
 }
 .floor-stack {
   position: absolute;
@@ -168,7 +161,7 @@ select.form-control {
   background: linear-gradient(135deg, #00FFCB, #48CAE4);
   border-radius: 6px;
   box-shadow: 0 0 10px rgba(72, 202, 228, 0.6);
-  animation: layer-floating 3s ease-in-out infinite alternate;
+  /* animation: layer-floating 3s ease-in-out infinite alternate; <- Removido */
 }
 .layer1 {
   transform: rotateX(15deg) rotateY(10deg) translateZ(0);
@@ -179,10 +172,7 @@ select.form-control {
 .layer3 {
   transform: rotateX(15deg) rotateY(0deg) translateZ(-20px);
 }
-@keyframes layer-floating {
-  0% { transform: rotateX(15deg) rotateY(5deg) translateZ(-10px); }
-  100% { transform: rotateX(15deg) rotateY(5deg) translateZ(-15px) translateY(-5px); }
-}
+/* @keyframes layer-floating removido */
 .check-bubble {
   position: absolute;
   bottom: 0;
@@ -218,35 +208,26 @@ select.form-control {
   left: 25px;
   top: 23px;
 }
-@keyframes logo-pulse {
-  0% { transform: scale(0.95); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(0.95); }
-}
+/* @keyframes logo-pulse removido */
 
 /* ==============================
-   Wizard Steps (Slide Transitions)
+   Wizard Steps (GSAP-Powered)
 ================================= */
+.wizard-steps-wrapper {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+}
 .wizard-steps-container {
   display: flex;
-  transition: transform 0.5s ease-in-out;
+  width: 400%; /* 4 steps * 100% width */
 }
 .wizard-step {
-  min-width: 100%;
-  transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-  /* Oculta os passos inativos */
-  display: none;
+  width: 25%; /* 100% / 4 steps */
+  flex-shrink: 0;
+  padding: 0 5px; /* Pequeno espaçamento para evitar toques acidentais */
 }
-.wizard-step.active {
-  /* Mostra o passo ativo */
-  display: block;
-  animation: fadeIn 0.5s ease-in-out; /* Reutiliza o fadeIn para o passo que se torna ativo */
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* A animação agora é controlada inteiramente pelo GSAP */
 
 /* Estilização da Barra de Progresso */
 .progress {
@@ -256,13 +237,13 @@ select.form-control {
 }
 .progress-bar {
   font-weight: 500;
-  transition: width 0.5s ease-in-out;
+  transition: width 0.4s ease-in-out;
 }
 
 /* ==============================
    CHECKLIST TABLE
 ================================= */
-.checklist-table-container {
+.table-responsive {
   max-height: 300px;
   overflow-y: auto;
   border-radius: 8px;
@@ -280,44 +261,6 @@ select.form-control {
 }
 #checklistTable .btn-danger:hover {
   background-color: #c82333;
-}
-
-/* Animações para as linhas da tabela */
-@keyframes fadeInRow {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-.fade-in-row {
-  animation: fadeInRow 0.4s ease-out;
-}
-@keyframes fadeOutRow {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.9); }
-}
-.fade-out-row {
-  animation: fadeOutRow 0.3s ease-in;
-}
-
-/* ==============================
-   LAYOUT DE DUAS COLUNAS (Desktop)
-================================= */
-@media (min-width: 992px) {
-  .main-layout {
-    display: flex;
-    gap: 2rem;
-  }
-  .form-column {
-    flex: 1 1 45%;
-  }
-  .table-column {
-    flex: 1 1 55%;
-    display: flex;
-    flex-direction: column;
-  }
-  .checklist-table-container {
-    flex-grow: 1; /* Faz a tabela ocupar o espaço disponível */
-    max-height: 450px; /* Aumenta a altura máxima em desktop */
-  }
 }
 
 /* ==============================
