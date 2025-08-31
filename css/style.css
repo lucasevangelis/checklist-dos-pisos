@@ -14,15 +14,8 @@ body {
    APP CONTAINER (Centraliza e limita o conteúdo)
 ================================= */
 .app-container {
-  max-width: 500px; /* Largura padrão para mobile-first */
+  max-width: 500px;
   margin: auto;
-  transition: max-width 0.4s ease-in-out;
-}
-/* Aumenta a largura em telas maiores para o layout de duas colunas */
-@media (min-width: 992px) {
-  .app-container {
-    max-width: 1100px;
-  }
 }
 
 /* ==============================
@@ -63,7 +56,7 @@ body {
 }
 .btn-tech:hover {
   background-color: #00bfa6;
-  /* transform: translateY(-2px); <- Removido para GSAP */
+  transform: translateY(-2px);
 }
 .btn-success-tech {
   background-color: #28a745;
@@ -75,7 +68,7 @@ body {
 }
 .btn-success-tech:hover {
   background-color: #218838;
-  /* transform: translateY(-2px); <- Removido para GSAP */
+  transform: translateY(-2px);
 }
 #clearData {
   background-color: #ffc107;
@@ -87,7 +80,7 @@ body {
 }
 #clearData:hover {
   background-color: #e0a800;
-  /* transform: translateY(-2px); <- Removido para GSAP */
+  transform: translateY(-2px);
 }
 
 /* ==============================
@@ -234,13 +227,7 @@ select.form-control {
   flex-shrink: 0;
   padding: 0 5px; /* Pequeno espaçamento para evitar toques acidentais */
 }
-/* A animação agora é controlada inteiramente pelo GSAP,
-   não precisamos mais das classes .active ou display:none aqui */
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+/* A animação agora é controlada inteiramente pelo GSAP */
 
 /* Estilização da Barra de Progresso */
 .progress {
@@ -250,13 +237,13 @@ select.form-control {
 }
 .progress-bar {
   font-weight: 500;
-  transition: width 0.5s ease-in-out;
+  transition: width 0.4s ease-in-out;
 }
 
 /* ==============================
    CHECKLIST TABLE
 ================================= */
-.checklist-table-container {
+.table-responsive {
   max-height: 300px;
   overflow-y: auto;
   border-radius: 8px;
@@ -274,44 +261,6 @@ select.form-control {
 }
 #checklistTable .btn-danger:hover {
   background-color: #c82333;
-}
-
-/* Animações para as linhas da tabela */
-@keyframes fadeInRow {
-  from { opacity: 0; transform: scale(0.9); }
-  to { opacity: 1; transform: scale(1); }
-}
-.fade-in-row {
-  animation: fadeInRow 0.4s ease-out;
-}
-@keyframes fadeOutRow {
-  from { opacity: 1; transform: scale(1); }
-  to { opacity: 0; transform: scale(0.9); }
-}
-.fade-out-row {
-  animation: fadeOutRow 0.3s ease-in;
-}
-
-/* ==============================
-   LAYOUT DE DUAS COLUNAS (Desktop)
-================================= */
-@media (min-width: 992px) {
-  .main-layout {
-    display: flex;
-    gap: 2rem;
-  }
-  .form-column {
-    flex: 1 1 45%;
-  }
-  .table-column {
-    flex: 1 1 55%;
-    display: flex;
-    flex-direction: column;
-  }
-  .checklist-table-container {
-    flex-grow: 1; /* Faz a tabela ocupar o espaço disponível */
-    max-height: 450px; /* Aumenta a altura máxima em desktop */
-  }
 }
 
 /* ==============================

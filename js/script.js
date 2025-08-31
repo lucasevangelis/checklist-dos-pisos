@@ -1,10 +1,7 @@
-(function() {
-  "use strict"; // Ativa o modo estrito para um código mais limpo
+// Array local para armazenar as entradas do checklist
+let checklistArray = [];
 
-  // Array local para armazenar as entradas do checklist
-  let checklistArray = [];
-
-  // Função para gerar hash SHA‑256 de uma senha
+// Função para gerar hash SHA‑256 de uma senha
 async function hashPassword(password) {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
@@ -47,6 +44,20 @@ async function initializeDefaultUsers() {
 // Variável global para o usuário logado
 let loggedUser = null;
 
+// Exibe um toast de feedback (Info)
+function showInfoToast(message) {
+  const toastElem = document.getElementById("toastMsg");
+  toastElem.querySelector(".toast-body").textContent = message;
+  $(toastElem).toast('show');
+}
+
+// Exibe um toast de feedback (Erro)
+function showErrorToast(message) {
+  const toastElem = document.getElementById("toastError");
+  toastElem.querySelector(".toast-body").textContent = message;
+  $(toastElem).toast('show');
+}
+
 // Função para exibir um modal de confirmação genérico
 function showConfirmModal(body, onConfirm) {
   const modal = $('#confirmModal');
@@ -60,62 +71,6 @@ function showConfirmModal(body, onConfirm) {
     onConfirm();
     modal.modal('hide');
   });
-}
-
-// Exibe um toast de feedback (Info)
-function showInfoToast(message) {
-  const toastElem = document.getElementById("toastMsg");
-  toastElem.querySelector(".toast-body").textContent = message;
-  $(toastElem).toast('show');
-}
-
-// Adiciona micro-interações aos elementos da UI
-function applyMicroInteractions() {
-  // Animação de hover para botões
-  document.querySelectorAll(".btn").forEach(btn => {
-    // Evita aplicar a animação no botão de "loading"
-    if(btn.dataset.originalHtml) return;
-
-    btn.addEventListener("mouseenter", () => gsap.to(btn, { duration: 0.2, scale: 1.05, y: -2, ease: "power1.out" }));
-    btn.addEventListener("mouseleave", () => gsap.to(btn, { duration: 0.2, scale: 1, y: 0, ease: "power1.out" }));
-  });
-
-  // Animação de foco para inputs
-  document.querySelectorAll(".form-control").forEach(input => {
-    input.addEventListener("focus", () => {
-      gsap.to(input, {
-        duration: 0.3,
-        boxShadow: "0 0 15px rgba(72, 202, 228, 0.6)",
-        ease: "power2.out"
-      });
-    });
-    input.addEventListener("blur", () => {
-      gsap.to(input, {
-        duration: 0.3,
-        boxShadow: "0 0 0 rgba(72, 202, 228, 0)",
-        ease: "power2.out"
-      });
-    });
-  });
-}
-
-// Ativa/desativa o estado de loading de um botão
-function setButtonLoading(button, isLoading) {
-  if (isLoading) {
-    button.disabled = true;
-    button.dataset.originalHtml = button.innerHTML;
-    button.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Gerando...`;
-  } else {
-    button.disabled = false;
-    button.innerHTML = button.dataset.originalHtml;
-  }
-}
-
-// Exibe um toast de feedback (Erro)
-function showErrorToast(message) {
-  const toastElem = document.getElementById("toastError");
-  toastElem.querySelector(".toast-body").textContent = message;
-  $(toastElem).toast('show');
 }
 
 // Animação do Splash Screen com GSAP
@@ -151,13 +106,6 @@ function animateSplashScreen(onComplete) {
     });
 }
 
-// Remove o splash screen com fade out (agora controlado por GSAP)
-function removeSplash() {
-  // A função removeSplash agora é um wrapper para a animação do GSAP,
-  // ou pode ser removida se a animação for chamada diretamente.
-  // Por enquanto, a lógica está em animateSplashScreen.
-}
-
 // Persiste o checklist no localStorage para o usuário logado
 function saveTableData() {
   if (!loggedUser) return;
@@ -186,40 +134,27 @@ function clearChecklistData() {
   });
 }
 
-// Renderiza o checklist na tabela visível para o usuário
+// Renderiza o checklist em uma tabela (para visualização interna)
 function renderChecklistTable() {
   const tbody = document.querySelector("#checklistTable tbody");
-  // Adicionado para evitar erro se a tabela não estiver na página
-  if (!tbody) {
-    console.error("Elemento tbody da tabela de checklist não foi encontrado!");
-    return;
-  }
-  tbody.innerHTML = ""; // Limpa a tabela antes de renderizar
-  checklistArray.forEach((entry, index) => {
+  tbody.innerHTML = "";
+  checklistArray.forEach(entry => {
     const tr = document.createElement("tr");
-
-    // Cria as células para Data, Piso, Posição, Observação
     entry.forEach(item => {
       const td = document.createElement("td");
       td.textContent = item;
       tr.appendChild(td);
     });
-
-    // Cria a célula de Ação com o botão de remover
+    // Botão para remover linha individual
     const tdAction = document.createElement("td");
     const btnRemove = document.createElement("button");
-    btnRemove.innerHTML = '<i class="fas fa-trash-alt"></i>'; // Ícone de lixeira
+    btnRemove.textContent = "Remover";
     btnRemove.className = "btn btn-danger btn-sm";
-    btnRemove.setAttribute("title", "Remover esta entrada");
     btnRemove.addEventListener("click", () => {
-      // Adiciona uma animação de fade-out antes de remover
-      tr.classList.add("fade-out-row");
-      setTimeout(() => {
-        checklistArray.splice(index, 1); // Remove o item pelo índice
-        saveTableData();
-        renderChecklistTable(); // Re-renderiza a tabela
-        showInfoToast("Entrada removida.");
-      }, 300); // Espera a animação terminar
+      checklistArray = checklistArray.filter(e => e !== entry);
+      saveTableData();
+      renderChecklistTable();
+      showInfoToast("Entrada removida.");
     });
     tdAction.appendChild(btnRemove);
     tr.appendChild(tdAction);
@@ -318,13 +253,6 @@ function addEntry() {
   saveTableData();
   renderChecklistTable();
 
-  // Anima a nova linha que foi adicionada à tabela
-  const tableRows = document.querySelectorAll("#checklistTable tbody tr");
-  if (tableRows.length > 0) {
-    const newRow = tableRows[tableRows.length - 1];
-    gsap.from(newRow, { duration: 0.5, opacity: 0, y: 20, ease: "power2.out" });
-  }
-
   // Limpa os campos de Piso, Posição e Observação (mantém Data)
   wizPisoElem.value = "2";
   wizPosicaoElem.value = "";
@@ -341,28 +269,14 @@ function generateExcel() {
     showErrorToast("Nenhuma entrada no checklist para gerar.");
     return;
   }
-
-  const btn = document.getElementById("generateExcel");
-  setButtonLoading(btn, true);
-
-  // Usa setTimeout para dar tempo da UI atualizar antes de travar com a geração do arquivo
-  setTimeout(() => {
-    try {
-      const data = [];
-      const headers = ["Data", "Piso", "Posição", "Observação"];
-      data.push(headers);
-      checklistArray.forEach(item => data.push(item));
-      const ws = XLSX.utils.aoa_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Checklist");
-      XLSX.writeFile(wb, "checklist.xlsx");
-    } catch (error) {
-      console.error("Erro ao gerar Excel:", error);
-      showErrorToast("Ocorreu um erro ao gerar o arquivo Excel.");
-    } finally {
-      setButtonLoading(btn, false);
-    }
-  }, 200); // 200ms de delay
+  const data = [];
+  const headers = ["Data", "Piso", "Posição", "Observação"];
+  data.push(headers);
+  checklistArray.forEach(item => data.push(item));
+  const ws = XLSX.utils.aoa_to_sheet(data);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Checklist");
+  XLSX.writeFile(wb, "checklist.xlsx");
 }
 
 // Função para tratar o login/registro do usuário
@@ -383,8 +297,7 @@ async function handleLogin(e) {
       users[userInput] = hashedInput;
       localStorage.setItem("users", JSON.stringify(users));
       showInfoToast("Usuário registrado com sucesso! Faça o login agora.");
-      // Limpa os campos para o usuário tentar logar novamente
-      document.getElementById("password").value = "";
+      document.getElementById("password").value = ""; // Limpa a senha para nova tentativa de login
     });
   } else {
     if (users[userInput] !== hashedInput) {
@@ -441,8 +354,5 @@ window.addEventListener("load", async function() {
       setDefaultDate();
       showStep(1); // Inicia o wizard no primeiro passo
     }
-    // Aplica as animações de micro-interação depois que a UI principal estiver visível
-    applyMicroInteractions();
   });
 });
-})();
