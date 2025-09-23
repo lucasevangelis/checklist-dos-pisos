@@ -58,7 +58,12 @@ body {
    ESTADOS INTERATIVOS (Focus, Active, Disabled)
 ================================= */
 .btn:active, .form-control:active { transform: scale(0.97) translateY(1px); }
-.btn:focus, .form-control:focus { outline: none; box-shadow: 0 0 12px rgba(0, 255, 203, 0.7); border-color: #00FFCB; }
+.btn:focus, .form-control:focus {
+  outline: none;
+  /* Usando o azul mais escuro do tema para o brilho, criando contraste com o texto branco */
+  box-shadow: 0 0 12px rgba(72, 202, 228, 0.7);
+  border-color: #48CAE4;
+}
 .btn:disabled, .form-control:disabled { opacity: 0.5; cursor: not-allowed; }
 
 /* ==============================
