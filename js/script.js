@@ -215,23 +215,12 @@ function showStep(step) {
   const container = document.querySelector(".wizard-steps-container");
   const offset = (step - 1) * -100;
 
-  // --- ADICIONE ESTA LINHA PARA DEBUG ---
-  console.log(`Função showStep chamada para o passo: ${step}. Deslocamento: ${offset}%`);
-  // --- FIM DO DEBUG ---
-
-  // =============================================================
-  // ===== TESTE: Desativando a animação e definindo a posição diretamente =====
-
-  // Comente a linha abaixo (adicione // no início)
-  // gsap.to(container, {
-  //   duration: 0.6,
-  //   xPercent: offset,
-  //   ease: "power2.inOut"
-  // });
-
-  // Adicione esta linha no lugar:
-  container.style.transform = `translateX(${offset}%)`;
-  // =============================================================
+  // Reativa a animação original com GSAP
+  gsap.to(container, {
+    duration: 0.6,
+    xPercent: offset,
+    ease: "power2.inOut"
+  });
 
   updateWizardProgress(step);
   currentStep = step;

@@ -279,6 +279,7 @@ select.form-control {
   overflow: hidden;
   position: relative;
   width: 100%;
+  min-height: 180px; /* Garante altura mínima durante a transição */
 }
 .wizard-steps-container {
   display: flex;
