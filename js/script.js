@@ -217,6 +217,10 @@ function showStep(step) {
   // Calcula o deslocamento. step 1 = 0%, step 2 = -100%, etc.
   const offset = (step - 1) * -100;
 
+  // --- ADICIONE ESTA LINHA PARA DEBUG ---
+  console.log(`Função showStep chamada para o passo: ${step}. Deslocamento: ${offset}%`);
+  // --- FIM DO DEBUG ---
+
   gsap.to(container, {
     duration: 0.6,
     xPercent: offset,
