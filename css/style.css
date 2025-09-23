@@ -288,6 +288,7 @@ select.form-control {
   width: 25%; /* 100% / 4 steps */
   flex-shrink: 0;
   padding: 0 5px; /* Pequeno espaçamento para evitar toques acidentais */
+  box-sizing: border-box;
 }
 /* A animação agora é controlada inteiramente pelo GSAP */
 
