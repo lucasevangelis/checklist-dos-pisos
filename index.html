@@ -103,6 +103,7 @@
               <div class="wizard-step" id="step1">
                 <label for="wizDate" class="text-light-tech">Data</label>
                 <input type="date" class="form-control mb-3" id="wizDate" required />
+                <div class="invalid-feedback">A data é obrigatória.</div>
                 <button type="button" class="btn btn-tech float-right" id="nextStep1">
                   Próximo <i class="fas fa-arrow-right"></i>
                 </button>
@@ -128,6 +129,7 @@
             <div class="wizard-step" id="step3">
             <label for="wizPosicao" class="text-light-tech">Posição (somente números)</label>
             <input type="number" class="form-control mb-3" id="wizPosicao" placeholder="Ex: 101" />
+            <div class="invalid-feedback">Apenas números são permitidos.</div>
             <button type="button" class="btn btn-secondary" id="backStep3">
               <i class="fas fa-arrow-left"></i> Voltar
             </button>
