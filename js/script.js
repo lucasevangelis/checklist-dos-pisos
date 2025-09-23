@@ -213,19 +213,25 @@ function updateWizardProgress(step) {
 // Wizard: Mostra o passo desejado com animação de slide GSAP
 function showStep(step) {
   const container = document.querySelector(".wizard-steps-container");
-
-  // Calcula o deslocamento. step 1 = 0%, step 2 = -100%, etc.
   const offset = (step - 1) * -100;
 
   // --- ADICIONE ESTA LINHA PARA DEBUG ---
   console.log(`Função showStep chamada para o passo: ${step}. Deslocamento: ${offset}%`);
   // --- FIM DO DEBUG ---
 
-  gsap.to(container, {
-    duration: 0.6,
-    xPercent: offset,
-    ease: "power2.inOut"
-  });
+  // =============================================================
+  // ===== TESTE: Desativando a animação e definindo a posição diretamente =====
+
+  // Comente a linha abaixo (adicione // no início)
+  // gsap.to(container, {
+  //   duration: 0.6,
+  //   xPercent: offset,
+  //   ease: "power2.inOut"
+  // });
+
+  // Adicione esta linha no lugar:
+  container.style.transform = `translateX(${offset}%)`;
+  // =============================================================
 
   updateWizardProgress(step);
   currentStep = step;
