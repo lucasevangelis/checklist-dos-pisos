@@ -66,6 +66,12 @@ body {
 }
 .btn:disabled, .form-control:disabled { opacity: 0.5; cursor: not-allowed; }
 
+/* Força a cor do texto para preto QUANDO o campo está selecionado */
+.form-control:focus {
+  color: #000 !important; /* Texto preto para máximo contraste */
+  background-color: #fff; /* Fundo branco para garantir a leitura */
+}
+
 /* ==============================
    VALIDAÇÃO DE FORMULÁRIO
 ================================= */
