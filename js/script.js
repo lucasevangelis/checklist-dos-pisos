@@ -134,30 +134,63 @@ function clearChecklistData() {
   });
 }
 
-// Renderiza o checklist em uma tabela (para visualização interna)
+// Cria o elemento <tr> para uma entrada do checklist
+function createEntryRow(entry) {
+  const tr = document.createElement("tr");
+  // Usar um atributo de dados para identificar a linha é mais robusto
+  tr.dataset.entry = JSON.stringify(entry);
+
+  // Cria as células da tabela
+  entry.forEach(item => {
+    const td = document.createElement("td");
+    td.textContent = item;
+    tr.appendChild(td);
+  });
+
+  // Célula de ação com o botão de remover
+  const tdAction = document.createElement("td");
+  const btnRemove = document.createElement("button");
+  btnRemove.textContent = "Remover";
+  btnRemove.className = "btn btn-danger btn-sm";
+  btnRemove.setAttribute("aria-label", "Remover item");
+
+  btnRemove.addEventListener("click", () => {
+    // Chama a função de exclusão passando a referência da linha (tr)
+    deleteEntry(entry, tr);
+  });
+
+  tdAction.appendChild(btnRemove);
+  tr.appendChild(tdAction);
+  return tr;
+}
+
+// Remove uma entrada do array e do DOM de forma eficiente
+function deleteEntry(entry, rowElement) {
+  const message = `Deseja realmente remover a entrada do piso ${entry[1]}, posição ${entry[2]}?`;
+  showConfirmModal(message, () => {
+    // Procura o índice do item a ser removido de forma segura
+    const entryIndex = checklistArray.findIndex(item => JSON.stringify(item) === JSON.stringify(entry));
+    if (entryIndex > -1) {
+      checklistArray.splice(entryIndex, 1); // Remove do array
+      saveTableData(); // Salva o estado atualizado
+
+      // Aplica a animação de saída e remove o elemento ao final
+      rowElement.classList.add('table-row-exit');
+      rowElement.addEventListener('animationend', () => {
+        rowElement.remove();
+      }, { once: true });
+
+      showInfoToast("Entrada removida.");
+    }
+  });
+}
+
+// Renderiza a tabela inteira (usado apenas no carregamento inicial)
 function renderChecklistTable() {
   const tbody = document.querySelector("#checklistTable tbody");
-  tbody.innerHTML = "";
+  tbody.innerHTML = ""; // Limpa a tabela antes de renderizar
   checklistArray.forEach(entry => {
-    const tr = document.createElement("tr");
-    entry.forEach(item => {
-      const td = document.createElement("td");
-      td.textContent = item;
-      tr.appendChild(td);
-    });
-    // Botão para remover linha individual
-    const tdAction = document.createElement("td");
-    const btnRemove = document.createElement("button");
-    btnRemove.textContent = "Remover";
-    btnRemove.className = "btn btn-danger btn-sm";
-    btnRemove.addEventListener("click", () => {
-      checklistArray = checklistArray.filter(e => e !== entry);
-      saveTableData();
-      renderChecklistTable();
-      showInfoToast("Entrada removida.");
-    });
-    tdAction.appendChild(btnRemove);
-    tr.appendChild(tdAction);
+    const tr = createEntryRow(entry);
     tbody.appendChild(tr);
   });
 }
@@ -194,27 +227,53 @@ function showStep(step) {
   currentStep = step;
 }
 
+// --- Funções de Validação de Formulário ---
+function setValid(element) {
+  element.classList.remove('is-invalid');
+}
+
+function setInvalid(element) {
+  element.classList.add('is-invalid');
+}
+
+function validateDate() {
+  const wizDate = document.getElementById("wizDate");
+  if (wizDate.value) {
+    setValid(wizDate);
+    return true;
+  } else {
+    setInvalid(wizDate);
+    return false;
+  }
+}
+
+function validatePosition() {
+  const wizPosicao = document.getElementById("wizPosicao");
+  // Permite campo vazio (opcional), mas se preenchido, deve ser número
+  if (/^\d*$/.test(wizPosicao.value)) {
+    setValid(wizPosicao);
+    return true;
+  } else {
+    setInvalid(wizPosicao);
+    return false;
+  }
+}
+
+
 // Funções para avançar o wizard
 function nextStep1() {
-  const wizDate = document.getElementById("wizDate");
-  if (!wizDate.value) {
-    showErrorToast("Por favor, selecione a data.");
-    wizDate.focus();
-    return;
+  if (validateDate()) {
+    showStep(2);
   }
-  showStep(2);
 }
 function nextStep2() {
   showStep(3);
 }
 function nextStep3() {
-  const wizPosicao = document.getElementById("wizPosicao");
-  if (!/^\d+$/.test(wizPosicao.value)) {
-    showErrorToast("Apenas números são permitidos na Posição.");
-    wizPosicao.focus();
-    return;
+  // A posição não é obrigatória, mas se preenchida, deve ser válida
+  if (validatePosition()) {
+    showStep(4);
   }
-  showStep(4);
 }
 
 // Função para retornar ao início do wizard (Passo 1)
@@ -225,6 +284,15 @@ function goToInicio() {
 
 // Adiciona a entrada do wizard ao checklist e volta ao início (mantendo a data)
 function addEntry() {
+  // Executa a validação final antes de adicionar
+  const isDateValid = validateDate();
+  const isPositionValid = validatePosition();
+
+  if (!isDateValid || !isPositionValid) {
+    showErrorToast("Por favor, corrija os campos destacados.");
+    return;
+  }
+
   const wizDateElem = document.getElementById("wizDate");
   const wizPisoElem = document.getElementById("wizPiso");
   const wizPosicaoElem = document.getElementById("wizPosicao");
@@ -235,23 +303,19 @@ function addEntry() {
   const wizPosicao = wizPosicaoElem.value;
   let wizObs = wizObsElem.value.trim();
 
-  if (!wizDate) {
-    showErrorToast("A data é obrigatória.");
-    wizDateElem.focus();
-    return;
-  }
-  if (!/^\d+$/.test(wizPosicao)) {
-    showErrorToast("Apenas números são permitidos na Posição.");
-    wizPosicaoElem.focus();
-    return;
-  }
   if (wizObs.length > 0) {
     wizObs = capitalizeFirstLetter(wizObs);
   }
 
-  checklistArray.push([wizDate, wizPiso, wizPosicao, wizObs]);
-  saveTableData();
-  renderChecklistTable();
+  const newEntry = [wizDate, wizPiso, wizPosicao, wizObs];
+  checklistArray.push(newEntry);
+  saveTableData(); // Salva o array atualizado
+
+  // Adiciona a nova linha ao DOM com animação
+  const tbody = document.querySelector("#checklistTable tbody");
+  const newRow = createEntryRow(newEntry);
+  tbody.appendChild(newRow);
+  newRow.classList.add('table-row-enter'); // Aplica a classe de animação
 
   // Limpa os campos de Piso, Posição e Observação (mantém Data)
   wizPisoElem.value = "2";
@@ -322,6 +386,11 @@ function handleLogout() {
 // Eventos
 document.getElementById("loginForm").addEventListener("submit", handleLogin);
 document.getElementById("logoutBtn").addEventListener("click", handleLogout);
+
+// Validação em tempo real
+document.getElementById("wizDate").addEventListener('input', validateDate);
+document.getElementById("wizPosicao").addEventListener('input', validatePosition);
+
 document.getElementById("nextStep1").addEventListener("click", nextStep1);
 document.getElementById("nextStep2").addEventListener("click", nextStep2);
 document.getElementById("nextStep3").addEventListener("click", nextStep3);

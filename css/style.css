@@ -44,43 +44,107 @@ body {
 }
 
 /* ==============================
-   BOTÕES PERSONALIZADOS
+   BOTÕES PERSONALIZADOS E INPUTS
 ================================= */
+.btn {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+  will-change: transform, box-shadow;
+  border: none;
+}
+
 .btn-tech {
   background-color: #00FFCB;
   color: #000;
   border-radius: 25px;
   padding: 0.75rem 1.25rem;
-  border: none;
-  transition: background-color 0.3s, transform 0.3s;
 }
 .btn-tech:hover {
   background-color: #00bfa6;
   transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
+
 .btn-success-tech {
   background-color: #28a745;
-  border: none;
   border-radius: 25px;
   padding: 0.75rem 1.25rem;
   color: #fff;
-  transition: background-color 0.3s, transform 0.3s;
 }
 .btn-success-tech:hover {
   background-color: #218838;
   transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
+
 #clearData {
   background-color: #ffc107;
   color: #000;
   border-radius: 25px;
   padding: 0.5rem 1rem;
-  border: none;
-  transition: background-color 0.3s, transform 0.3s;
 }
 #clearData:hover {
   background-color: #e0a800;
   transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.form-control {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(72, 202, 228, 0.3);
+  color: #fff !important; /* Forçar cor do texto */
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.form-control::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ==============================
+   ESTADOS INTERATIVOS (Focus, Active, Disabled)
+================================= */
+.btn:active, .form-control:active {
+  transform: scale(0.97) translateY(1px);
+}
+.btn:active {
+  box-shadow: none !important;
+}
+
+.btn:focus, .form-control:focus {
+  outline: none;
+  box-shadow: 0 0 12px rgba(0, 255, 203, 0.7); /* Glow neon ciano */
+}
+.form-control:focus {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-color: #00FFCB;
+}
+
+.btn:disabled, .form-control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* --- Validação de Formulário --- */
+.form-control.is-invalid {
+  border-color: #dc3545 !important;
+}
+
+.form-control.is-invalid:focus {
+  box-shadow: 0 0 12px rgba(220, 53, 69, 0.7); /* Glow neon vermelho */
+}
+
+.invalid-feedback {
+  display: none; /* Oculto por padrão */
+  width: 100%;
+  margin-top: .25rem;
+  font-size: .875em;
+  color: #ff8a80; /* Vermelho mais claro para legibilidade */
+  font-weight: 500;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+}
+
+.is-invalid ~ .invalid-feedback {
+  display: block; /* Exibido quando o input é inválido */
 }
 
 /* ==============================
@@ -103,11 +167,9 @@ body {
   min-width: 90px;
 }
 select.form-control {
-  background-color: #444;
-  color: #fff;
   width: 100%;
   min-width: 80px;
-  border: none;
+  /* Estilos base já aplicados em .form-control */
 }
 
 /* ==============================
@@ -279,4 +341,38 @@ select.form-control {
     position: static;
     margin-top: 10px;
   }
+}
+
+/* ==============================
+   ANIMAÇÕES DA TABELA DE CHECKLIST
+================================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.table-row-enter {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.table-row-exit {
+  animation: fadeOut 0.4s ease-out forwards;
 }
