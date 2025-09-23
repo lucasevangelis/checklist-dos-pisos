@@ -64,30 +64,22 @@ function clearChecklistData() {
   });
 }
 
-// --- LÓGICA DO WIZARD (FORMULÁRIO) - REESCRITA ---
+// --- LÓGICA DO WIZARD (FORMULÁRIO) ---
 function updateWizardProgress(step) {
   const progressBar = document.getElementById("wizardProgressBar");
   const progress = (step / 4) * 100;
   progressBar.style.width = `${progress}%`;
   progressBar.textContent = `Passo ${step} de 4`;
 }
-
 function showStep(step) {
-  // Encontra o passo atualmente ativo e o esconde
-  const currentActive = document.querySelector(".wizard-step.active");
-  if (currentActive) {
-    currentActive.classList.remove('active');
-  }
-  // Encontra o novo passo e o exibe
-  const nextStep = document.getElementById(`step${step}`);
-  if (nextStep) {
-    nextStep.classList.add('active');
-  }
+  document.querySelectorAll(".wizard-step").forEach(el => el.style.display = 'none');
+  const targetStep = document.getElementById(`step${step}`);
+  if (targetStep) targetStep.style.display = 'block';
   updateWizardProgress(step);
   currentStep = step;
 }
 
-// --- VALIDAÇÃO ---
+// --- VALIDAÇÃO VISUAL ---
 function setValid(element) { element.classList.remove('is-invalid'); }
 function setInvalid(element) { element.classList.add('is-invalid'); }
 function validateDate() {
@@ -95,8 +87,9 @@ function validateDate() {
   return el.value ? (setValid(el), true) : (setInvalid(el), false);
 }
 function validatePosition() {
-  const el = document.getElementById("wizPosicao");
-  return /^\d*$/.test(el.value) ? (setValid(el), true) : (setInvalid(el), false);
+    const el = document.getElementById("wizPosicao");
+    // Permite campo vazio, mas não permite letras.
+    return /^\d*$/.test(el.value) ? (setValid(el), true) : (setInvalid(el), false);
 }
 
 // --- LÓGICA DA TABELA ---
@@ -111,7 +104,7 @@ function createEntryRow(entry) {
   const actionTd = document.createElement("td");
   const removeBtn = document.createElement("button");
   removeBtn.className = "btn btn-danger btn-sm";
-  removeBtn.textContent = "Remover";
+  removeBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
   removeBtn.onclick = () => deleteEntry(entry, tr);
   actionTd.appendChild(removeBtn);
   tr.appendChild(actionTd);
@@ -132,7 +125,6 @@ function addEntry() {
   saveTableData();
   const newRow = createEntryRow(newEntry);
   document.querySelector("#checklistTable tbody").appendChild(newRow);
-  newRow.classList.add('table-row-enter');
   showInfoToast("Entrada adicionada!");
   ['wizPosicao', 'wizObs'].forEach(id => document.getElementById(id).value = '');
   document.getElementById('wizPiso').value = "2";
@@ -144,8 +136,7 @@ function deleteEntry(entry, rowElement) {
     if (entryIndex > -1) {
       checklistArray.splice(entryIndex, 1);
       saveTableData();
-      rowElement.classList.add('table-row-exit');
-      rowElement.addEventListener('animationend', () => rowElement.remove(), { once: true });
+      rowElement.remove(); // Remove apenas o elemento da interface, sem redesenhar tudo
       showInfoToast("Entrada removida.");
     }
   });
@@ -191,7 +182,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     let users = JSON.parse(localStorage.getItem("users") || '{}');
     const hashedPass = await hashPassword(pass);
     if (!users[user]) {
-      showConfirmModal("Usuário não encontrado. Deseja registrá-lo?", () => {
+        showConfirmModal("Usuário não encontrado. Deseja registrá-lo?", () => {
         users[user] = hashedPass;
         localStorage.setItem("users", JSON.stringify(users));
         showInfoToast("Usuário registrado! Faça o login.");

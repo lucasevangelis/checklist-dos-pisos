@@ -38,48 +38,32 @@ body {
 }
 
 /* ==============================
-   BOTÕES PERSONALIZADOS E INPUTS
+   BOTÕES E INPUTS
 ================================= */
-.btn {
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-  border: none;
-}
-.btn-tech {
-  background-color: #00FFCB; color: #000; border-radius: 25px; padding: 0.75rem 1.25rem;
-}
-.btn-tech:hover {
-  background-color: #00bfa6; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-}
-.btn-success-tech {
-  background-color: #28a745; border-radius: 25px; padding: 0.75rem 1.25rem; color: #fff;
-}
-.btn-success-tech:hover {
-  background-color: #218838; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-}
+.btn { transition: transform 0.2s ease, box-shadow 0.2s ease; border: none; }
+.btn-tech { background-color: #00FFCB; color: #000; border-radius: 25px; padding: 0.75rem 1.25rem; }
+.btn-tech:hover { background-color: #00bfa6; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); }
+.btn-success-tech { background-color: #28a745; border-radius: 25px; padding: 0.75rem 1.25rem; color: #fff; }
+.btn-success-tech:hover { background-color: #218838; transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); }
+
 .form-control {
   background-color: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(72, 202, 228, 0.3);
   color: #fff !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.form-control::placeholder {
-  color: rgba(255, 255, 255, 0.5);
-}
+.form-control::placeholder { color: rgba(255, 255, 255, 0.5); }
 
 /* ==============================
    ESTADOS INTERATIVOS (Focus, Active, Disabled)
 ================================= */
-.btn:active, .form-control:active {
-  transform: scale(0.97) translateY(1px);
-}
-.btn:focus, .form-control:focus {
-  outline: none;
-  box-shadow: 0 0 12px rgba(0, 255, 203, 0.7);
-  border-color: #00FFCB;
-}
-.btn:disabled, .form-control:disabled {
-  opacity: 0.5; cursor: not-allowed;
-}
+.btn:active, .form-control:active { transform: scale(0.97) translateY(1px); }
+.btn:focus, .form-control:focus { outline: none; box-shadow: 0 0 12px rgba(0, 255, 203, 0.7); border-color: #00FFCB; }
+.btn:disabled, .form-control:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ==============================
+   VALIDAÇÃO DE FORMULÁRIO
+================================= */
 .form-control.is-invalid {
   border-color: #dc3545 !important;
 }
@@ -95,30 +79,18 @@ body {
 }
 
 /* ==============================
-   NOVO WIZARD (Sistema de FADE)
+   WIZARD (Sistema de FADE)
 ================================= */
-.wizard-steps-container {
-  position: relative;
-  min-height: 180px; /* Previne o "colapso" de altura durante a transição */
-}
 .wizard-step {
-  /* Todos os passos ficam escondidos por padrão */
-  display: none;
-  opacity: 0;
-  transition: opacity 0.4s ease-in-out;
-  /* Posicionamento para sobrepor no mesmo lugar */
-  position: absolute;
-  width: 100%;
+  display: none; /* Escondido por padrão */
+  animation: fadeIn 0.4s ease-out forwards;
 }
 .wizard-step.active {
-  /* O passo ativo se torna visível */
-  display: block;
-  opacity: 1;
+  display: block; /* O passo ativo se torna visível */
 }
-
-/* Barra de Progresso */
-.progress-bar {
-  transition: width 0.4s ease-in-out;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* ==============================
@@ -134,7 +106,3 @@ body {
 .bubble { position: relative; width: 100%; height: 100%; border-radius: 50%; background: #fff; }
 .check-stem { position: absolute; width: 6px; height: 28px; background: #48CAE4; transform: rotate(45deg); left: 22px; top: 10px; }
 .check-kick { position: absolute; width: 6px; height: 14px; background: #48CAE4; transform: rotate(-45deg); left: 25px; top: 23px; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-@keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
-.table-row-enter { animation: fadeIn 0.4s ease-out forwards; }
-.table-row-exit { animation: fadeOut 0.4s ease-out forwards; }

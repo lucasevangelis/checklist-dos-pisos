@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -18,7 +19,7 @@
       <div class="toast-body bg-info text-white">Mensagem de sucesso.</div>
     </div>
     <div id="toastError" class="toast" data-delay="3000">
-      <div class="toast-body bg-danger text-white">Mensagem de erro.</div>
+        <div class="toast-body bg-danger text-white">Mensagem de erro.</div>
     </div>
   </div>
 
@@ -34,14 +35,8 @@
       <div class="card-body">
         <h2 class="card-title text-center text-light-tech mb-4"><i class="fas fa-sign-in-alt"></i> Acesse seu Checklist</h2>
         <form id="loginForm">
-          <div class="form-group">
-            <label for="username" class="text-light-tech">Usuário</label>
-            <input type="text" class="form-control" id="username" placeholder="Digite seu usuário" required />
-          </div>
-          <div class="form-group">
-            <label for="password" class="text-light-tech">Senha</label>
-            <input type="password" class="form-control" id="password" placeholder="Digite sua senha" required />
-          </div>
+          <div class="form-group"><label for="username" class="text-light-tech">Usuário</label><input type="text" class="form-control" id="username" placeholder="Digite seu usuário" required /></div>
+          <div class="form-group"><label for="password" class="text-light-tech">Senha</label><input type="password" class="form-control" id="password" placeholder="Digite sua senha" required /></div>
           <button type="submit" class="btn btn-tech btn-block"><i class="fas fa-user-check"></i> Entrar / Registrar</button>
         </form>
       </div>
@@ -57,51 +52,43 @@
         </div>
 
         <form id="wizardForm">
-          <div class="wizard-progress mb-4">
-            <div class="progress">
-              <div id="wizardProgressBar" class="progress-bar bg-info" role="progressbar" style="width: 25%;">Passo 1 de 4</div>
-            </div>
+          <div class="wizard-step active" id="step1">
+            <label for="wizDate" class="text-light-tech">Data</label>
+            <input type="date" class="form-control mb-3" id="wizDate" required />
+            <div class="invalid-feedback">A data é obrigatória.</div>
+            <button type="button" class="btn btn-tech float-right" id="nextStep1">Próximo <i class="fas fa-arrow-right"></i></button>
           </div>
-
-          <div class="wizard-steps-container">
-            <div class="wizard-step active" id="step1">
-              <label for="wizDate" class="text-light-tech">Data</label>
-              <input type="date" class="form-control mb-3" id="wizDate" required />
-              <div class="invalid-feedback">A data é obrigatória.</div>
-              <button type="button" class="btn btn-tech float-right" id="nextStep1">Próximo <i class="fas fa-arrow-right"></i></button>
-            </div>
-            <div class="wizard-step" id="step2">
-              <label for="wizPiso" class="text-light-tech">Piso</label>
-              <select class="form-control mb-3" id="wizPiso">
-                <option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option>
-              </select>
-              <button type="button" class="btn btn-secondary" id="backStep2"><i class="fas fa-arrow-left"></i> Voltar</button>
-              <button type="button" class="btn btn-tech float-right" id="nextStep2">Próximo <i class="fas fa-arrow-right"></i></button>
-            </div>
-            <div class="wizard-step" id="step3">
-              <label for="wizPosicao" class="text-light-tech">Posição (somente números)</label>
-              <input type="number" class="form-control mb-3" id="wizPosicao" placeholder="Ex: 101" />
-              <div class="invalid-feedback">Apenas números são permitidos.</div>
-              <button type="button" class="btn btn-secondary" id="backStep3"><i class="fas fa-arrow-left"></i> Voltar</button>
-              <button type="button" class="btn btn-tech float-right" id="nextStep3">Próximo <i class="fas fa-arrow-right"></i></button>
-            </div>
-            <div class="wizard-step" id="step4">
-              <label for="wizObs" class="text-light-tech">Observação</label>
-              <input type="text" class="form-control mb-3" id="wizObs" placeholder="Observação" />
-              <button type="button" class="btn btn-secondary" id="backStep4"><i class="fas fa-arrow-left"></i> Voltar</button>
-              <button type="button" class="btn btn-success-tech float-right" id="addEntryBtn"><i class="fas fa-check"></i> Adicionar ao Checklist</button>
-            </div>
+          <div class="wizard-step" id="step2" style="display: none;">
+            <label for="wizPiso" class="text-light-tech">Piso</label>
+            <select class="form-control mb-3" id="wizPiso"><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select>
+            <button type="button" class="btn btn-secondary" id="backStep2"><i class="fas fa-arrow-left"></i> Voltar</button>
+            <button type="button" class="btn btn-tech float-right" id="nextStep2">Próximo <i class="fas fa-arrow-right"></i></button>
+          </div>
+          <div class="wizard-step" id="step3" style="display: none;">
+            <label for="wizPosicao" class="text-light-tech">Posição (somente números)</label>
+            <input type="number" class="form-control mb-3" id="wizPosicao" placeholder="Ex: 101" />
+            <div class="invalid-feedback">Apenas números são permitidos.</div>
+            <button type="button" class="btn btn-secondary" id="backStep3"><i class="fas fa-arrow-left"></i> Voltar</button>
+            <button type="button" class="btn btn-tech float-right" id="nextStep3">Próximo <i class="fas fa-arrow-right"></i></button>
+          </div>
+          <div class="wizard-step" id="step4" style="display: none;">
+            <label for="wizObs" class="text-light-tech">Observação</label>
+            <input type="text" class="form-control mb-3" id="wizObs" placeholder="Observação" />
+            <button type="button" class="btn btn-secondary" id="backStep4"><i class="fas fa-arrow-left"></i> Voltar</button>
+            <button type="button" class="btn btn-success-tech float-right" id="addEntryBtn"><i class="fas fa-check"></i> Adicionar ao Checklist</button>
           </div>
         </form>
 
-        <div class="table-responsive mt-4">
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.2);" />
+
+        <div class="table-responsive mt-2">
           <table class="table table-dark table-bordered" id="checklistTable">
             <thead class="thead-tech"><tr><th>Data</th><th>Piso</th><th>Posição</th><th>Observação</th><th>Ação</th></tr></thead>
             <tbody></tbody>
           </table>
         </div>
 
-        <hr />
+        <hr class="my-4" style="border-color: rgba(255,255,255,0.2);" />
         <div class="text-center">
           <button id="generateExcel" class="btn btn-success-tech"><i class="fas fa-file-excel"></i> Gerar Excel</button>
           <button id="clearData" class="btn btn-warning btn-sm ml-2"><i class="fas fa-trash-alt"></i> Limpar Checklist</button>
