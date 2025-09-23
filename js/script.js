@@ -95,8 +95,19 @@ function validatePosition() {
 // --- LÓGICA DA TABELA ---
 function renderChecklistTable() {
   const tbody = document.querySelector("#checklistTable tbody");
-  tbody.innerHTML = "";
-  checklistArray.forEach(entry => tbody.appendChild(createEntryRow(entry)));
+  const table = document.getElementById("checklistTable");
+  const emptyState = document.getElementById("emptyState");
+
+  tbody.innerHTML = ""; // Limpa a tabela
+
+  if (checklistArray.length === 0) {
+    table.style.display = "none";
+    emptyState.style.display = "block";
+  } else {
+    table.style.display = "table";
+    emptyState.style.display = "none";
+    checklistArray.forEach(entry => tbody.appendChild(createEntryRow(entry)));
+  }
 }
 function createEntryRow(entry) {
   const tr = document.createElement("tr");
